@@ -1,0 +1,14 @@
+- .env
+- .gitignore
+- backend
+  - db.js
+  - index.js
+  - package-lock.json
+  - package.json
+  - routes
+    - ai.js
+    - economy.js
+    - policy.js
+  - us-east-2-bundle.pem
+- README.md
+- schema.sql
