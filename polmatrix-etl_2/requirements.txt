@@ -1,0 +1,6 @@
+requests>=2.25.1
+sqlalchemy>=1.4
+psycopg2-binary>=2.9    # if you ever fallback to psycopg2
+python-dotenv>=0.19     # to load the .env file
+pandas>=1.5.0           # for Excel file processing
+openpyxl>=3.0.0         # for Excel file reading

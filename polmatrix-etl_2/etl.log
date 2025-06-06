@@ -1,0 +1,384 @@
+Traceback (most recent call last):
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\education_fetcher.py", line 106, in <module>
+    print("\u2705 Education data for USA loaded successfully.")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1254.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+Traceback (most recent call last):
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.InvalidColumnReference: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\health_fetcher.py", line 113, in <module>
+    conn.execute(text(sql), params)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Python313\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.InvalidColumnReference) there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+[SQL: 
+            INSERT INTO health
+              (geography_id, time_id, indicator_code, life_expectancy, source)
+            VALUES
+              (%(geography_id)s, %(time_id)s, %(indicator_code)s, %(life_expectancy)s, %(source)s)
+            ON CONFLICT (geography_id, time_id, indicator_code)
+            DO UPDATE
+              SET life_expectancy   = EXCLUDED.life_expectancy,
+                  source  = EXCLUDED.source;
+            ]
+[parameters: {'geography_id': 1, 'time_id': 57, 'indicator_code': 'WHOSIS_000001', 'life_expectancy': 74.1, 'source': 'WHO_GHO'}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+Traceback (most recent call last):
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\health_fetcher.py", line 99, in <module>
+    col:               float(val),
+                       ~~~~~^^^^^
+ValueError: could not convert string to float: '23.3 [15.0-34.2]'Traceback (most recent call last):
+  File "C:\Python313\Lib\site-packages\requests\models.py", line 974, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 2 column 1 (char 2)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\health_fetcher.py", line 75, in <module>
+    facts = resp.json().get("fact", [])
+            ~~~~~~~~~^^
+  File "C:\Python313\Lib\site-packages\requests\models.py", line 978, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting property name enclosed in double quotes: line 2 column 1 (char 2)[INFO] No data for WHOSIS_000012.
+[WARN] Non-JSON response for indicator HEALTH_EXP_PC_GDP (HTTP 200):
+{ ,  } 
+Health data for USA loaded successfully.[INFO] No data for WHOSIS_000012.
+[WARN] Non-JSON response for indicator HEALTH_EXP_PC_GDP (HTTP 200):
+{ ,  } 
+Health data for USA loaded successfully.
+[INFO] No data array for EN.ATM.CO2E.PC, skipping.
+Traceback (most recent call last):
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column "renewable_energy_pct" of relation "environment" does not exist
+LINE 3: ...          (geography_id, time_id, indicator_code, renewable_...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\environment_fetcher.py", line 130, in <module>
+    conn.execute(text(sql), params)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Python313\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column "renewable_energy_pct" of relation "environment" does not exist
+LINE 3: ...          (geography_id, time_id, indicator_code, renewable_...
+                                                             ^
+
+[SQL: 
+            INSERT INTO environment
+              (geography_id, time_id, indicator_code, renewable_energy_pct, source)
+            VALUES
+              (%(geography_id)s, %(time_id)s, %(indicator_code)s, %(renewable_energy_pct)s, %(source)s)
+            ON CONFLICT (geography_id, time_id, indicator_code)
+            DO UPDATE SET
+              renewable_energy_pct  = EXCLUDED.renewable_energy_pct,
+              source = EXCLUDED.source;
+            ]
+[parameters: {'geography_id': 1, 'time_id': 53, 'indicator_code': 'EG.FEC.RNEW.ZS', 'renewable_energy_pct': 10.9, 'source': 'WorldBank'}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[INFO] No data array for EN.ATM.CO2E.PC, skipping.
+Traceback (most recent call last):
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column "renewable_energy_pct" of relation "environment" does not exist
+LINE 3: ...          (geography_id, time_id, indicator_code, renewable_...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\environment_fetcher.py", line 130, in <module>
+    conn.execute(text(sql), params)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Python313\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column "renewable_energy_pct" of relation "environment" does not exist
+LINE 3: ...          (geography_id, time_id, indicator_code, renewable_...
+                                                             ^
+
+[SQL: 
+            INSERT INTO environment
+              (geography_id, time_id, indicator_code, renewable_energy_pct, source)
+            VALUES
+              (%(geography_id)s, %(time_id)s, %(indicator_code)s, %(renewable_energy_pct)s, %(source)s)
+            ON CONFLICT (geography_id, time_id, indicator_code)
+            DO UPDATE SET
+              renewable_energy_pct  = EXCLUDED.renewable_energy_pct,
+              source = EXCLUDED.source;
+            ]
+[parameters: {'geography_id': 1, 'time_id': 53, 'indicator_code': 'EG.FEC.RNEW.ZS', 'renewable_energy_pct': 10.9, 'source': 'WorldBank'}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[INFO] No data array for EN.ATM.CO2E.PC, skipping.
+Environment data for USA loaded successfully.
+[INFO] Indicator EN.ATM.CO2E.PC JSON list has fewer than 2 elements (len=1). Full payload:
+[{'message': [{'id': '175', 'key': 'Invalid format', 'value': 'The indicator was not found. It may have been deleted or archived.'}]}]
+[OK] Upserted renewable_energy_percentage for USA.
+[OK] Upserted forest_area_pct for USA.
+[OK] Upserted pm25 for USA.
+Environment data for USA loaded successfully.
+[INFO] Indicator EN.ATM.CO2E.KT JSON list has fewer than 2 elements (len=1). Full payload:
+[{'message': [{'id': '175', 'key': 'Invalid format', 'value': 'The indicator was not found. It may have been deleted or archived.'}]}]
+[OK] Upserted renewable_energy_percentage for USA.
+[OK] Upserted forest_area_pct for USA.
+[OK] Upserted pm25 for USA.
+Environment data for USA loaded successfully.
+[INFO] Indicator EN.ATM.CO2E.GF.KT JSON list has fewer than 2 elements (len=1). Full payload:
+[{'message': [{'id': '175', 'key': 'Invalid format', 'value': 'The indicator was not found. It may have been deleted or archived.'}]}]
+[OK] Upserted renewable_energy_percentage for USA.
+[OK] Upserted forest_area_pct for USA.
+[OK] Upserted pm25 for USA.
+Environment data for USA loaded successfully.
+[INFO] Indicator EN.ATM.CO2E.SF.KT JSON list has fewer than 2 elements (len=1). Full payload:
+[{'message': [{'id': '175', 'key': 'Invalid format', 'value': 'The indicator was not found. It may have been deleted or archived.'}]}]
+[OK] Upserted renewable_energy_percentage for USA.
+[OK] Upserted forest_area_pct for USA.
+[OK] Upserted pm25 for USA.
+Environment data for USA loaded successfully.
+[OK] Upserted co2_emissions for USA.
+[OK] Upserted renewable_energy_percentage for USA.
+[OK] Upserted forest_area_pct for USA.
+[OK] Upserted pm25 for USA.
+
+[INFO] Processing EDGAR greenhouse gas data...
+
+[INFO] Processing EDGAR file: IEA_EDGAR_CO2_1970_2022.zip
+[INFO] Downloading EDGAR data: IEA_EDGAR_CO2_1970_2022.zip
+[INFO] Extracting IEA_EDGAR_CO2_1970_2022.xlsx from IEA_EDGAR_CO2_1970_2022.zip
+[WARN] Country USA not found in EDGAR data
+[INFO] No data found for USA in IEA_EDGAR_CO2_1970_2022.zip
+
+[INFO] Processing EDGAR file: EDGAR_CH4_1970_2022.zip
+[INFO] Downloading EDGAR data: EDGAR_CH4_1970_2022.zip
+[INFO] Extracting EDGAR_CH4_1970_2022.xlsx from EDGAR_CH4_1970_2022.zip
+[WARN] Country USA not found in EDGAR data
+[INFO] No data found for USA in EDGAR_CH4_1970_2022.zip
+
+[INFO] Processing EDGAR file: EDGAR_N2O_1970_2022.zip
+[INFO] Downloading EDGAR data: EDGAR_N2O_1970_2022.zip
+[INFO] Extracting EDGAR_N2O_1970_2022.xlsx from EDGAR_N2O_1970_2022.zip
+[WARN] Country USA not found in EDGAR data
+[INFO] No data found for USA in EDGAR_N2O_1970_2022.zip
+Environment data for USA loaded successfully.
+[OK] Upserted renewable_energy_percentage for USA.
+[OK] Upserted forest_area_pct for USA.
+[OK] Upserted pm25 for USA.
+
+[INFO] Processing EDGAR greenhouse gas data...
+
+[INFO] Processing EDGAR file: IEA_EDGAR_CO2_1970_2022.zip
+[INFO] Downloading EDGAR data: IEA_EDGAR_CO2_1970_2022.zip
+[INFO] Extracting IEA_EDGAR_CO2_1970_2022.xlsx from IEA_EDGAR_CO2_1970_2022.zip
+[WARN] Country USA not found in EDGAR data
+[INFO] No data found for USA in IEA_EDGAR_CO2_1970_2022.zip
+
+[INFO] Processing EDGAR file: EDGAR_CH4_1970_2022.zip
+[INFO] Downloading EDGAR data: EDGAR_CH4_1970_2022.zip
+[INFO] Extracting EDGAR_CH4_1970_2022.xlsx from EDGAR_CH4_1970_2022.zip
+[WARN] Country USA not found in EDGAR data
+[INFO] No data found for USA in EDGAR_CH4_1970_2022.zip
+
+[INFO] Processing EDGAR file: EDGAR_N2O_1970_2022.zip
+[INFO] Downloading EDGAR data: EDGAR_N2O_1970_2022.zip
+[INFO] Extracting EDGAR_N2O_1970_2022.xlsx from EDGAR_N2O_1970_2022.zip
+[WARN] Country USA not found in EDGAR data
+[INFO] No data found for USA in EDGAR_N2O_1970_2022.zip
+Environment data for USA loaded successfully.
+Traceback (most recent call last):
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\environment_fetcher.py", line 160, in <module>
+    geo_id = get_geography_id(conn, COUNTRY)
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\environment_fetcher.py", line 67, in get_geography_id
+    raise RuntimeError(f"No geography entry for country_code={code}")
+RuntimeError: No geography entry for country_code=United States of America
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\environment_fetcher.py", line 292
+    print(f"[OK] Inserted {len(records)} EDGAR {col_name} records for {COUNTRY_NAME}.")
+                                                                                       ^
+IndentationError: unindent does not match any outer indentation level
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\environment_fetcher.py", line 293
+    print(f"[OK] Inserted {len(records)} EDGAR {col_name} records for '{COUNTRY_NAME_EDGAR}'.")
+                                                                                               ^
+IndentationError: unindent does not match any outer indentation level
+Traceback (most recent call last):
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\environment_fetcher.py", line 160, in <module>
+    geo_id = get_geography_id(conn, COUNTRY)
+  File "C:\Users\Ahmed\Projects\polmatrix-etl_2\environment_fetcher.py", line 67, in get_geography_id
+    raise RuntimeError(f"No geography entry for country_code={code}")
+RuntimeError: No geography entry for country_code=United States
