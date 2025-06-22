@@ -8,10 +8,12 @@
     - re.md
   - api
     - ai
-      - empty.tsx
+      - simulate.ts
       - [...slug]
         - route.ts
     - empty.tsx
+    - hooks
+      - useSimulation.ts
   - correlation
     - page.tsx
   - dashboard
@@ -46,10 +48,12 @@
   - PromptInput.tsx
   - SamplePrompts.tsx
   - Sidebar.tsx
+  - SimulationEconomyChart.tsx
   - SimulationResults.tsx
   - SkeletonCard.tsx
   - SkeletonTable.tsx
   - SmartPolicyAnalyzer.tsx
+  - TestGrid.tsx
   - ThemeToggle.tsx
   - ViewToggle.tsx
 - components.json
@@ -58,6 +62,7 @@
 - eslint.config.mjs
 - lib
   - api.ts
+  - chartTransforms.ts
   - chartTypes.ts
   - economyMetrics.ts
   - filtersConfig.ts

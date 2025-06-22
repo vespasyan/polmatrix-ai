@@ -245,7 +245,7 @@ export default function ChartTabs({
         <div className="bg-gradient-to-r from-[var(--card-bg)] to-[var(--input-bg)] px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-green-500">
                 <TrendingUp className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -264,7 +264,7 @@ export default function ChartTabs({
                 onClick={() => setCorrelationTab("impact")}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-300 ${
                   correlationTab === "impact"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
+                    ? "bg-gradient-to-r from-blue-500 to-yellow-500 text-white shadow-lg"
                     : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]"
                 }`}
               >
@@ -275,7 +275,7 @@ export default function ChartTabs({
                 onClick={() => setCorrelationTab("matrix")}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-300 ${
                   correlationTab === "matrix"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
+                    ? "bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-lg"
                     : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]"
                 }`}
               >

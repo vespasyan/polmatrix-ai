@@ -1,108 +1,37 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter } from 'recharts'
 import { TrendingUp, BarChart3, Activity, Zap, Download, Share2 } from 'lucide-react'
+import { useSimulation } from "../app/api/hooks/useSimulation"
 
-interface Analysis {
-  domains: string[]
-  primary_domain: string
-  metrics: string[]
-  time_focus: string
-  geographic_scope: string
-  visualization_type: string
-  key_relationships: string[]
-  confidence: number
-}
-
-interface DomainData {
-  count: number
-  data: any[]
-  error?: string
-}
-
-interface DynamicChartsProps {
-  analysis: Analysis
-  data: Record<string, DomainData>
+interface Props {
   question: string
+  selectedChartType: string
+  selectedMetrics: string[]
+  domainColor: {
+    primary: string
+    secondary: string
+    light: string
+  }
 }
 
-const CHART_TYPES = [
-  { id: 'line', name: 'Trend Analysis', icon: TrendingUp, description: 'Show trends over time' },
-  { id: 'bar', name: 'Comparison', icon: BarChart3, description: 'Compare values across categories' },
-  { id: 'area', name: 'Area Chart', icon: Activity, description: 'Show cumulative trends' },
-  { id: 'scatter', name: 'Correlation', icon: Zap, description: 'Show relationships between metrics' }
-]
+export default function DynamicCharts({ question, selectedChartType, selectedMetrics, domainColor }: Props) {
+  const { data: chartData, loading, run } = useSimulation()
 
-const DOMAIN_COLORS = {
-  economy: { primary: '#3B82F6', secondary: '#93C5FD', light: '#EBF8FF' },
-  health: { primary: '#EF4444', secondary: '#FCA5A5', light: '#FEF2F2' },
-  education: { primary: '#8B5CF6', secondary: '#C4B5FD', light: '#F5F3FF' },
-  environment: { primary: '#10B981', secondary: '#86EFAC', light: '#F0FDF4' }
-}
+  // Kick off the simulation when the component mounts or question changes
+  useEffect(() => {
+    if (question) run(question)
+  }, [question, run])
 
-export default function DynamicCharts({ analysis, data, question }: DynamicChartsProps) {
-  const [selectedChartType, setSelectedChartType] = useState(
-    analysis.visualization_type === 'trend_analysis' ? 'line' :
-    analysis.visualization_type === 'comparison' ? 'bar' :
-    analysis.visualization_type === 'correlation' ? 'scatter' : 'line'
-  )
-  const [selectedDomain, setSelectedDomain] = useState(analysis.primary_domain)
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(analysis.metrics.slice(0, 3))
-
-  // Transform data for visualization
-  const chartData = useMemo(() => {
-    const domainData = data[selectedDomain]
-    if (!domainData || !domainData.data || domainData.data.length === 0) {
-      return []
-    }
-
-    // Group data by year and country for better visualization
-    const processedData = domainData.data.map(item => {
-      const processed: any = {
-        id: item.id,
-        country: item.country_name,
-        year: item.year,
-        label: item.label || `${item.country_name} ${item.year}`
-      }
-
-      // Add selected metrics to the data
-      selectedMetrics.forEach(metric => {
-        if (item[metric] !== undefined && item[metric] !== null) {
-          processed[metric] = parseFloat(item[metric]) || 0
-        }
-      })
-
-      return processed
-    }).filter(item => {
-      // Only include items that have at least one metric value
-      return selectedMetrics.some(metric => item[metric] !== undefined && !isNaN(item[metric]))
-    })
-
-    return processedData
-  }, [data, selectedDomain, selectedMetrics])
-
-  // Get available metrics for the selected domain
-  const availableMetrics = useMemo(() => {
-    const domainData = data[selectedDomain]
-    if (!domainData || !domainData.data || domainData.data.length === 0) {
-      return []
-    }
-
-    const sampleItem = domainData.data[0]
-    return Object.keys(sampleItem).filter(key => 
-      !['id', 'geography_id', 'time_id', 'indicator_code', 'source', 'country_name', 'year', 'label'].includes(key) &&
-      typeof sampleItem[key] === 'number' || 
-      (typeof sampleItem[key] === 'string' && !isNaN(parseFloat(sampleItem[key])))
-    )
-  }, [data, selectedDomain])
-
-  const domainColor = DOMAIN_COLORS[selectedDomain as keyof typeof DOMAIN_COLORS] || DOMAIN_COLORS.economy
+  if (loading) return <div>Loading simulation…</div>
 
   const exportData = () => {
+    if (!chartData.length) return
+    
     const csvContent = [
       ['Country', 'Year', ...selectedMetrics].join(','),
-      ...chartData.map(item => 
+      ...chartData.map((item: any) => 
         [item.country, item.year, ...selectedMetrics.map(metric => item[metric] || '')].join(',')
       )
     ].join('\n')
@@ -111,12 +40,12 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `policy_analysis_${selectedDomain}_${Date.now()}.csv`
+    a.download = `policy_analysis_${Date.now()}.csv`
     a.click()
   }
 
   const shareAnalysis = () => {
-    const shareText = `Policy Analysis: ${question}\n\nKey findings for ${selectedDomain} domain with ${chartData.length} data points.\n\nGenerated by PolMatrix Smart Policy Analyzer`
+    const shareText = `Policy Analysis: ${question}\n\nKey findings with ${chartData.length} data points.\n\nGenerated by PolMatrix Smart Policy Analyzer`
     
     if (navigator.share) {
       navigator.share({
@@ -136,7 +65,7 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
         <div className="h-64 flex items-center justify-center text-gray-500">
           <div className="text-center">
             <p className="text-lg font-medium">No data available</p>
-            <p className="text-sm">Try selecting different metrics or domain</p>
+            <p className="text-sm">Try running the simulation again</p>
           </div>
         </div>
       )
@@ -177,7 +106,6 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
                   borderRadius: '8px'
                 }}
               />
-              
               <Legend />
               {selectedMetrics.slice(0, 4).map((metric, index) => (
                 <Line
@@ -189,7 +117,7 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
                          index === 2 ? '#96a1b5' : '#ccd8ed'}
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  name={metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  name={metric.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                 />
               ))}
             </LineChart>
@@ -230,7 +158,7 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
                   dataKey={metric}
                   fill={index === 0 ? domainColor.primary : 
                        index === 1 ? domainColor.secondary : '#9CA3AF'}
-                  name={metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  name={metric.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                 />
               ))}
             </BarChart>
@@ -239,7 +167,7 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
 
       case 'area':
         return (
-          <ResponsiveContainer {...commonProps} >
+          <ResponsiveContainer {...commonProps}>
             <AreaChart data={chartData} stackOffset="sign">
               <CartesianGrid 
                 stroke="var(--color-border)" 
@@ -276,7 +204,7 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
                   fill={index === 0 ? domainColor.primary : 
                        index === 1 ? domainColor.secondary : '#9CA3AF'}
                   fillOpacity={0.6}
-                  name={metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  name={metric.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                 />
               ))}
             </AreaChart>
@@ -321,7 +249,7 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
                 }}
                 formatter={(value: any, name: string, props: any) => [
                   value,
-                  name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                  name.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
                 ]}
                 labelFormatter={(label: any, payload: any) => 
                   payload && payload[0] && payload[0].payload ? payload[0].payload.label : label
@@ -349,7 +277,7 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Dynamic Visualization</h2>
             <p className="text-gray-600 mt-1">
-              Showing {chartData.length} data points for {selectedDomain} domain
+              Showing {chartData.length} data points from simulation
             </p>
           </div>
           
@@ -371,69 +299,6 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Domain Selection */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Domain</label>
-            <select
-              value={selectedDomain}
-              onChange={(e) => setSelectedDomain(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              {analysis.domains.map(domain => (
-                <option key={domain} value={domain}>
-                  {domain.charAt(0).toUpperCase() + domain.slice(1)} ({data[domain]?.count || 0} records)
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Chart Type Selection */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Visualization Type</label>
-            <select
-              value={selectedChartType}
-              onChange={(e) => setSelectedChartType(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              {CHART_TYPES.map(type => (
-                <option key={type.id} value={type.id}>
-                  {type.name} - {type.description}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Metrics Selection */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Metrics ({selectedMetrics.length} selected)
-            </label>
-            <div className="max-h-32 overflow-y-auto space-y-1 border border-gray-300 rounded-lg p-2">
-              {availableMetrics.map(metric => (
-                <label key={metric} className="flex items-center space-x-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={selectedMetrics.includes(metric)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedMetrics([...selectedMetrics, metric])
-                      } else {
-                        setSelectedMetrics(selectedMetrics.filter(m => m !== metric))
-                      }
-                    }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="capitalize">
-                    {metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Chart */}
         <div className="bg-gray-50 rounded-lg p-4">
           {renderChart()}
@@ -448,13 +313,13 @@ export default function DynamicCharts({ analysis, data, question }: DynamicChart
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-900">
-                {new Set(chartData.map(d => d.country)).size}
+                {new Set(chartData.map((d: any) => d.country)).size}
               </p>
               <p className="text-sm text-gray-600">Countries</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-900">
-                {new Set(chartData.map(d => d.year)).size}
+                {new Set(chartData.map((d: any) => d.year)).size}
               </p>
               <p className="text-sm text-gray-600">Time Periods</p>
             </div>

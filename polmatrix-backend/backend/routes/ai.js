@@ -2,6 +2,46 @@ const express = require("express")
 const router = express.Router()
 const axios = require("axios")
 const db = require("../db")
+const { parsePolicyQuestion } = require("../services/parser")
+const { generateSimulatorData } = require("../services/simulator")
+
+// New simulation endpoint
+router.post("/simulate", (req, res, next) => {
+ console.log("Simulation request received:", req.body.text);
+  try {
+    const parsed = parsePolicyQuestion(req.body.text);
+    console.log("Parsed parameters:", parsed);
+    const data = generateSimulatorData(parsed);
+    console.log("Simulated rows:", data.length);
+    return res.json({ data });
+  } catch (err) {
+    console.error("Simulation error:", err);
+    next(err);
+  }
+});
+
+// GET version of simulate endpoint for easy testing
+router.get("/simulate", (req, res, next) => {
+  console.log("GET Simulation request received");
+  try {
+    // Use a default test question if none provided
+    const testQuestion = req.query.text || "What is the impact of education spending on economic growth?";
+    console.log("Using test question:", testQuestion);
+    
+    const parsed = parsePolicyQuestion(testQuestion);
+    console.log("Parsed parameters:", parsed);
+    const data = generateSimulatorData(parsed);
+    console.log("Simulated rows:", data.length);
+    return res.json({ 
+      data,
+      message: "GET simulation test - use POST for production",
+      testQuestion 
+    });
+  } catch (err) {
+    console.error("Simulation error:", err);
+    next(err);
+  }
+});
 
 // Test endpoint (GET)
 router.get("/test", (req, res) => {
@@ -374,8 +414,9 @@ Keep the response clear, actionable, and evidence-based. Focus on practical poli
     res.status(500).json({ 
       error: "Failed to generate insights",
       details: error.response?.data?.error?.message || error.message
-    });
-  }
+    });  }
 });
+
+
 
 module.exports = router
