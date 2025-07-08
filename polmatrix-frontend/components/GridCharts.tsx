@@ -84,6 +84,7 @@ export default function GridCharts({
       color: "#06B6D4",
       delay: 0.1
     },
+
     {
       component: EnvironmentChart,
       data: environmentData,
@@ -94,6 +95,7 @@ export default function GridCharts({
       color: "#22C55E",
       delay: 0.2
     },
+
     {
       component: HealthChart,
       data: healthData,

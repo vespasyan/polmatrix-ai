@@ -17,7 +17,7 @@ import {
   TooltipProps,
 } from "recharts"
 import { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent"
-import { Share2, Download, BarChart2, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Check, Info, BarChart3 } from 'lucide-react'
+import { Share2, Download, BarChart2, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Check, Info, BarChart3, ChevronDown, ChevronUp } from 'lucide-react'
 import { metricsConfig } from "@/lib/metricsConfig"
 
 type ChartType = "bar" | "line" | "area"
@@ -86,6 +86,7 @@ export default function EconomyChart({
 }: Props) {
   const [chartType, setChartType] = useState<ChartType>("line")
   const [isExporting, setIsExporting] = useState(false)
+  const [isMetricsExpanded, setIsMetricsExpanded] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
 
   const handleShare = useCallback(async () => {
@@ -115,16 +116,40 @@ export default function EconomyChart({
     
     setIsExporting(true)
     try {
-      // You can implement chart export functionality here
-      // For now, we'll just simulate the process
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      console.log('Chart exported successfully')
+      // Download CSV functionality
+      const headers = ["year", ...selectedMetrics]
+      const csvRows = [
+        headers.join(","),
+        ...data.map(row => {
+          const values = headers.map(header => {
+            const value = row[header]
+            return typeof value === 'string' && value.includes(',') ? `"${value}"` : value
+          })
+          return values.join(",")
+        })
+      ]
+
+      const csvString = csvRows.join("\n")
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement("a")
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob)
+        link.setAttribute("href", url)
+        link.setAttribute("download", "economy_data.csv")
+        link.style.visibility = 'hidden'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        setTimeout(() => {
+          URL.revokeObjectURL(url)
+        }, 100)
+      }
     } catch (error) {
       console.error('Error exporting chart:', error)
     } finally {
       setIsExporting(false)
     }
-  }, [])
+  }, [data, selectedMetrics])
 
   const chartTypeConfig = {
     bar: { 
@@ -160,7 +185,7 @@ export default function EconomyChart({
       case "bar":
         return (
           <BarChart {...chartProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" opacity={0.9} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" opacity={0.3} />
             <XAxis 
               dataKey="year" 
               stroke="var(--text-secondary)"
@@ -335,35 +360,72 @@ export default function EconomyChart({
       </div>
 
       {/* Metrics Selection */}
-      <div className="p-4 bg-[var(--input-bg)] rounded-lg border border-[var(--border-color)]">
-        <div className="flex items-center gap-2 mb-3">
-          <Info className="h-4 w-4 text-blue-500" />
-          <span className="text-sm font-medium text-[var(--text-primary)]">Available Metrics</span>
-          <span className="text-xs text-[var(--text-secondary)]">Click to toggle visibility</span>
-        </div>        <div className="flex flex-wrap gap-2">
-          {Object.entries(metricMap).map(([key, metric]) => {
-            const isSelected = selectedMetrics.includes(key)
-            return (
-              <button
-                key={key}
-                onClick={() => onToggleMetric(key)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  isSelected
-                    ? "bg-blue-500 text-white shadow-md"
-                    : "bg-[var(--card-bg)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]"
-                }`}
-              >
-                {isSelected && <Check size={14} />}
-                <span>{metric.label}</span>
-                {metric.unit && (
-                  <span className={`text-xs ${isSelected ? 'text-blue-100' : 'text-[var(--text-secondary)]'}`}>
-                    ({metric.unit})
-                  </span>
-                )}
-              </button>
-            )
-          })}
-        </div>
+      <div className="bg-[var(--input-bg)] rounded-lg border border-[var(--border-color)]">
+        <button
+          onClick={() => setIsMetricsExpanded(!isMetricsExpanded)}
+          className="w-full flex items-center justify-between p-4 hover:bg-[var(--hover-bg)] transition-all duration-200"
+        >
+          <div className="flex items-center gap-2">
+            <Info className="h-4 w-4 text-blue-500" />
+            <span className="text-sm font-medium text-[var(--text-primary)]">Available Metrics</span>
+            <span className="text-xs text-[var(--text-secondary)]">
+              ({Object.keys(metricMap).length} total, {selectedMetrics.length} selected)
+            </span>
+          </div>
+          {isMetricsExpanded ? (
+            <ChevronUp className="h-4 w-4 text-[var(--text-secondary)]" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
+          )}
+        </button>
+        
+        {isMetricsExpanded && (
+          <div className="px-4 pb-4 border-t border-[var(--border-color)] pt-3">
+            <div className="text-xs text-[var(--text-secondary)] mb-3">
+              Click to toggle visibility
+            </div>
+            
+            {/* Group metrics by category */}
+            {Object.entries(
+              Object.entries(metricMap).reduce((acc, [key, metric]) => {
+                const category = metric.description.split(' - ')[0] || 'Other'
+                if (!acc[category]) acc[category] = []
+                acc[category].push([key, metric])
+                return acc
+              }, {} as Record<string, Array<[string, typeof metricMap[string]]>>)
+            ).map(([category, metrics]) => (
+              <div key={category} className="mb-4 last:mb-0">
+                <h4 className="text-xs font-semibold text-[var(--text-primary)] mb-2 uppercase tracking-wide opacity-70">
+                  {category}
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {metrics.map(([key, metric]) => {
+                    const isSelected = selectedMetrics.includes(key)
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => onToggleMetric(key)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          isSelected
+                            ? "bg-blue-500 text-white shadow-md"
+                            : "bg-[var(--card-bg)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]"
+                        }`}
+                      >
+                        {isSelected && <Check size={14} />}
+                        <span>{metric.label}</span>
+                        {metric.unit && (
+                          <span className={`text-xs ${isSelected ? 'text-blue-100' : 'text-[var(--text-secondary)]'}`}>
+                            ({metric.unit})
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Chart */}

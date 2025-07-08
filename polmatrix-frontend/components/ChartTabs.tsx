@@ -143,7 +143,7 @@ export default function ChartTabs({
     <>
       <div className="rounded-xl shadow-lg bg-[var(--card-bg)] border border-[var(--border-color)] overflow-hidden">
         {/* Enhanced Tabs Header */}
-        <div className="bg-gradient-to-r from-[var(--card-bg)] to-[var(--input-bg)] px-6 pt-6 pb-4">
+        <div className="bg-gradient-to-r from-[var(--card-bg)] to-[var(--card-bg)] px-6 pt-6 pb-4">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold text-[var(--text-primary)]">Policy Impact Analysis</h2>

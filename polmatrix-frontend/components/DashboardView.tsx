@@ -5,7 +5,7 @@ import ChartTabs from "@/components/ChartTabs";
 import GlobalFilter from "@/components/GlobalFilter";
 import SimulationResults from "@/components/SimulationResults";
 import GridCharts from "@/components/GridCharts";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion"
 import { LayoutGrid, Layers, Plus, GitCompare, RefreshCw, Settings, AlertCircle, Brain, TrendingUp, Users, Heart, Leaf } from "lucide-react";
 import { 
@@ -72,6 +72,7 @@ const DOMAIN_COLORS = {
 
 export default function DashboardView({ initialPrompt: propInitialPrompt }: DashboardViewProps) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const urlInitialPrompt = searchParams.get("prompt");
   
   // Use prop initialPrompt or fall back to URL param
@@ -502,143 +503,443 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
             </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Futuristic Action Buttons */}
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Primary AI Analysis Button - Advanced Holographic Effect */}
             <button 
-              onClick={() => runSmartAnalysis("Generate comprehensive policy analysis across all domains")}
+              onClick={() => router.push('/')}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 shadow-lg"
+              className="btn-holographic btn-particle group relative overflow-hidden px-3 py-2 text-white font-medium rounded-lg shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/50 disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
             >
-              <Brain size={16} />
-              New Smart Analysis
+              {/* Multi-layered animated background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 opacity-75"></div>
+              <div className="absolute inset-0 bg-gradient-to-l from-pink-400 via-purple-500 to-indigo-600 opacity-50 animate-pulse"></div>
+              
+              {/* Advanced holographic overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+              
+              {/* Double border glow effect */}
+              <div className="absolute inset-0 rounded-lg border border-cyan-300/50 group-hover:border-cyan-300 transition-colors duration-300"></div>
+              <div className="absolute inset-0.5 rounded border border-white/20 group-hover:border-white/40 transition-colors duration-300"></div>
+              
+              {/* Scan lines */}
+              <div className="absolute inset-0 opacity-30">
+                <div className="absolute top-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
+                <div className="absolute bottom-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
+              </div>
+              
+              {/* Content with enhanced effects */}
+              <div className="relative flex items-center gap-2 z-10">
+                <div className="relative">
+                  <Brain size={14} className="animate-pulse text-cyan-200" />
+                  <div className="absolute inset-0 animate-ping">
+                    <Brain size={14} className="text-cyan-400 opacity-30" />
+                  </div>
+                </div>
+                <span className="bg-gradient-to-r from-white via-cyan-100 to-white bg-clip-text text-transparent font-semibold tracking-wide text-sm">
+                  New Smart Analysis
+                </span>
+                {/* Status indicator */}
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
+              </div>
             </button>
             
+            {/* Compare Scenarios Button - Futuristic Disabled State */}
             <button 
               disabled
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:bg-[var(--hover-bg)] transition-all duration-200 opacity-50 cursor-not-allowed"
+              className="btn-glitch group relative px-3 py-2 font-medium rounded-lg border overflow-hidden transition-all duration-300 cursor-not-allowed"
+              data-text=""
             >
-              <GitCompare size={16} />
-              Compare Scenarios
+              {/* Glitched background layers */}
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-slate-800 to-gray-900"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-red-500/10 to-orange-500/5 animate-pulse"></div>
+              
+              {/* Corrupted data pattern */}
+              <div className="absolute inset-0 opacity-30">
+                <div className="absolute top-0.5 left-1 w-4 h-px bg-red-400/50 animate-pulse"></div>
+                <div className="absolute top-2 right-2 w-3 h-px bg-orange-400/50 animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                <div className="absolute bottom-1 left-1/3 w-2 h-px bg-yellow-400/50 animate-pulse" style={{animationDelay: '0.6s'}}></div>
+              </div>
+              
+              {/* Warning border */}
+              <div className="absolute inset-0 rounded-lg border border-gray-700 group-hover:border-orange-500/30 transition-colors duration-300"></div>
+              
+              {/* Static interference lines */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-1/4 w-full h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent animate-pulse"></div>
+                <div className="absolute top-3/4 w-full h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
+              </div>
+              
+              {/* Content with disabled styling */}
+              <div className="relative flex items-center gap-2 z-10">
+                <div className="relative">
+                  <GitCompare size={14} className="text-gray-500 group-hover:text-orange-400/70 transition-colors duration-300" />
+                  {/* Error indicator */}
+                  <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse opacity-60"></div>
+                </div>
+                <span className="text-gray-400 group-hover:text-orange-400/70 transition-colors duration-300 tracking-wide text-sm">
+                  Compare
+                </span>
+                {/* Status badges */}
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-400 px-1.5 py-0.5 rounded-full border border-orange-500/30 animate-pulse">
+                    v2.0
+                  </span>
+                  <div className="flex space-x-0.5">
+                    <div className="w-0.5 h-0.5 bg-red-400 rounded-full animate-ping"></div>
+                    <div className="w-0.5 h-0.5 bg-orange-400 rounded-full animate-ping" style={{animationDelay: '0.3s'}}></div>
+                    <div className="w-0.5 h-0.5 bg-yellow-400 rounded-full animate-ping" style={{animationDelay: '0.6s'}}></div>
+                  </div>
+                </div>
+              </div>
             </button>
 
+            {/* Refresh Button - Advanced Cyberpunk Style */}
             <button 
               onClick={refreshData}
               disabled={dataLoading}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:bg-[var(--hover-bg)] transition-all duration-200 disabled:opacity-50"
+              className="btn-cyberpunk btn-neon group relative px-3 py-2 font-medium rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:scale-100 overflow-hidden"
             >
-              <RefreshCw size={16} className={dataLoading ? 'animate-spin' : ''} />
-              Refresh
+              {/* Base cyberpunk background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800"></div>
+              
+              {/* Animated circuit pattern */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute top-1 left-1 w-0.5 h-0.5 bg-emerald-400 rounded-full animate-ping"></div>
+                <div className="absolute top-2 right-2 w-0.5 h-0.5 bg-emerald-400 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
+                <div className="absolute bottom-1.5 left-1/2 w-0.5 h-0.5 bg-emerald-400 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
+              </div>
+              
+              {/* Matrix-style background effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              {/* Enhanced border system */}
+              <div className="absolute inset-0 rounded-lg border border-emerald-500/30 group-hover:border-emerald-400/60 transition-colors duration-300"></div>
+              <div className="absolute inset-0 rounded-lg border border-transparent group-hover:border-emerald-400/20 transition-colors duration-300"></div>
+              
+              {/* Data stream effect */}
+              <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-pulse"></div>
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-teal-400 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-pulse" style={{animationDelay: '0.3s'}}></div>
+              
+              {/* Content with enhanced styling */}
+              <div className="relative flex items-center gap-2 z-10">
+                <div className="relative">
+                  <RefreshCw 
+                    size={14} 
+                    className={`${
+                      dataLoading 
+                        ? 'animate-spin text-emerald-300' 
+                        : 'group-hover:rotate-180 text-emerald-400 group-hover:text-emerald-300'
+                    } transition-all duration-500`} 
+                  />
+                  {/* Orbital ring effect */}
+                  <div className="absolute inset-0 w-3.5 h-3.5 border border-emerald-400/30 rounded-full group-hover:animate-spin" style={{animationDuration: '3s'}}></div>
+                </div>
+                <span className="text-emerald-400 group-hover:text-emerald-300 transition-colors duration-300 font-medium tracking-wide text-sm">
+                  {dataLoading ? 'Sync' : 'Refresh'}
+                </span>
+                {/* Network status indicator */}
+                <div className="flex space-x-0.5">
+                  <div className="w-0.5 h-2 bg-emerald-400 rounded-sm animate-pulse"></div>
+                  <div className="w-0.5 h-2 bg-emerald-400 rounded-sm animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                  <div className="w-0.5 h-2 bg-emerald-400 rounded-sm animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                </div>
+              </div>
             </button>
 
-            {/* View Mode Toggle */}
-            <div className="flex gap-1 p-1 bg-[var(--input-bg)] rounded-lg border border-[var(--border-color)]">
-              <button
-                className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 ${
-                  viewMode === "tabs" 
-                    ? "bg-[var(--accent-color)] text-white shadow-sm" 
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                }`}
-                onClick={() => setViewMode("tabs")}
-              >
-                <Layers size={16} />
-                Tabs
-              </button>
-              <button
-                className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 ${
-                  viewMode === "grid" 
-                    ? "bg-[var(--accent-color)] text-white shadow-sm" 
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                }`}
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid size={16} />
-                Grid
-              </button>
-            </div>
+
           </div>
-        </div>        {/* Smart Analysis Results */}
+        </div>        {/* Futuristic Smart Analysis Results */}
         {smartAnalysis && !loading && (
-          <div className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl shadow-sm p-6 mb-6">
-            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-              <Brain className="h-5 w-5 text-blue-600" />
-              Smart Analysis Overview
-            </h2>
+          <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/80 via-blue-900/20 to-purple-900/20 backdrop-blur-sm border border-blue-500/30 rounded-2xl shadow-2xl p-6 mb-6">
+            {/* Animated background matrix effect */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-4 left-8 w-1 h-1 bg-cyan-400 rounded-full animate-ping"></div>
+              <div className="absolute top-12 right-16 w-1 h-1 bg-blue-400 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
+              <div className="absolute bottom-8 left-20 w-1 h-1 bg-purple-400 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
+              <div className="absolute bottom-16 right-8 w-1 h-1 bg-pink-400 rounded-full animate-ping" style={{animationDelay: '1.5s'}}></div>
+            </div>
+
+            {/* Circuit pattern overlay */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-0 left-1/4 w-px h-8 bg-gradient-to-b from-cyan-400 to-transparent"></div>
+              <div className="absolute top-0 left-1/4 w-8 h-px bg-gradient-to-r from-cyan-400 to-transparent"></div>
+              <div className="absolute bottom-0 right-1/4 w-px h-8 bg-gradient-to-t from-purple-400 to-transparent"></div>
+              <div className="absolute bottom-0 right-1/4 w-8 h-px bg-gradient-to-l from-purple-400 to-transparent"></div>
+            </div>
+
+            {/* Glowing border effect */}
+            <div className="absolute inset-0 rounded-2xl border border-blue-400/20 shadow-[0_0_30px_rgba(59,130,246,0.15)]"></div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              {smartAnalysis.domains.map(domain => {
+            {/* Header with enhanced styling */}
+            <div className="relative mb-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="relative p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                    <Brain className="h-6 w-6 text-white" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 to-pink-400/30 rounded-xl animate-pulse"></div>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
+                      Neural Analysis Overview
+                    </h2>
+                    <p className="text-slate-400 text-sm mt-1">AI-powered policy insights across multiple domains</p>
+                  </div>
+                </div>
+                
+                {/* Status indicator */}
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-400/30 rounded-lg">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-300 text-sm font-medium">Analysis Complete</span>
+                </div>
+              </div>
+              
+              {/* Data flow line */}
+              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent animate-pulse mt-4"></div>
+            </div>
+            
+            {/* Domain Cards with Futuristic Design */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {smartAnalysis.domains.map((domain, index) => {
                 const Icon = DOMAIN_ICONS[domain as keyof typeof DOMAIN_ICONS]
-                const colorClass = DOMAIN_COLORS[domain as keyof typeof DOMAIN_COLORS]
                 const isPrimary = domain === smartAnalysis.primary_domain
+                const dataCount = smartData?.data[domain]?.count || 0
+                
+                // Dynamic color themes for each domain
+                const domainThemes = {
+                  economy: { 
+                    bg: 'from-blue-500/20 to-cyan-500/20', 
+                    border: 'border-blue-400/40',
+                    glow: 'shadow-blue-500/20',
+                    text: 'text-blue-300',
+                    accent: 'bg-blue-500'
+                  },
+                  health: { 
+                    bg: 'from-red-500/20 to-pink-500/20', 
+                    border: 'border-red-400/40',
+                    glow: 'shadow-red-500/20',
+                    text: 'text-red-300',
+                    accent: 'bg-red-500'
+                  },
+                  education: { 
+                    bg: 'from-purple-500/20 to-violet-500/20', 
+                    border: 'border-purple-400/40',
+                    glow: 'shadow-purple-500/20',
+                    text: 'text-purple-300',
+                    accent: 'bg-purple-500'
+                  },
+                  environment: { 
+                    bg: 'from-green-500/20 to-emerald-500/20', 
+                    border: 'border-green-400/40',
+                    glow: 'shadow-green-500/20',
+                    text: 'text-green-300',
+                    accent: 'bg-green-500'
+                  }
+                }
+                
+                const theme = domainThemes[domain as keyof typeof domainThemes]
                 
                 return (
-                  <div key={domain} className={`
-                    p-4 rounded-lg border-2 transition-all duration-200
-                    ${isPrimary ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
-                    ${colorClass}
-                  `}>
-                    <div className="flex items-center space-x-3 mb-2">
-                      <Icon className="h-5 w-5" />
-                      <h3 className="font-semibold capitalize">{domain}</h3>
-                      {isPrimary && (
-                        <span className="px-2 py-1 text-xs bg-blue-600 text-white rounded-full">Primary</span>
-                      )}
+                  <div 
+                    key={domain} 
+                    className={`group relative overflow-hidden bg-gradient-to-br ${theme.bg} backdrop-blur-sm border ${theme.border} rounded-xl p-4 transition-all duration-500 hover:scale-105 hover:shadow-lg ${theme.glow} ${isPrimary ? 'ring-2 ring-cyan-400/50 ring-offset-2 ring-offset-slate-900' : ''}`}
+                    style={{animationDelay: `${index * 0.1}s`}}
+                  >
+                    {/* Animated background particle */}
+                    <div className="absolute top-2 right-2 w-1 h-1 bg-white/50 rounded-full animate-ping"></div>
+                    
+                    {/* Holographic overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 ${theme.accent} rounded-lg shadow-lg`}>
+                            <Icon className="h-4 w-4 text-white" />
+                          </div>
+                          <h3 className={`font-semibold capitalize ${theme.text} text-sm`}>{domain}</h3>
+                        </div>
+                        
+                        {isPrimary && (
+                          <div className="px-2 py-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs rounded-full font-medium shadow-lg animate-pulse">
+                            Primary
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Data visualization */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 text-xs">Data Points</span>
+                          <span className={`${theme.text} font-bold text-lg`}>{dataCount.toLocaleString()}</span>
+                        </div>
+                        
+                        {/* Mini progress bar */}
+                        <div className="w-full bg-slate-700/50 rounded-full h-1.5">
+                          <div 
+                            className={`h-1.5 ${theme.accent} rounded-full transition-all duration-1000 shadow-sm`}
+                            style={{ width: `${Math.min((dataCount / 100) * 100, 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm opacity-80">
-                      {smartData?.data[domain]?.count || 0} data points
-                    </p>
                   </div>
                 )
               })}
-            </div>            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <h4 className="font-semibold text-[var(--text-primary)] mb-2">Key Metrics</h4>
-                <div className="flex flex-wrap gap-2">
-                  {smartAnalysis.metrics.slice(0, 3).map(metric => (
-                    <span key={metric} className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-full text-sm">
-                      {metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </span>
-                  ))}
+            </div>
+            
+            {/* Advanced Metrics Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Key Metrics Panel */}
+              <div className="relative bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-400/30 rounded-xl p-4 overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent animate-pulse"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                    <h4 className="font-semibold text-cyan-300 text-sm">Neural Metrics</h4>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {smartAnalysis.metrics.slice(0, 3).map((metric, index) => (
+                      <div 
+                        key={metric} 
+                        className="group relative px-3 py-1.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 text-cyan-200 rounded-lg text-xs font-medium overflow-hidden transition-all duration-300 hover:scale-105"
+                        style={{animationDelay: `${index * 0.1}s`}}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"></div>
+                        <span className="relative z-10">
+                          {metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold text-[var(--text-primary)] mb-2">Analysis Focus</h4>
-                <p className="text-[var(--text-secondary)] capitalize text-sm">
-                  {smartAnalysis.time_focus.replace(/_/g, ' ')} • {smartAnalysis.geographic_scope}
-                </p>
+              {/* Analysis Focus Panel */}
+              <div className="relative bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-xl p-4 overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                    <h4 className="font-semibold text-purple-300 text-sm">Temporal Scope</h4>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
+                      <span className="text-purple-200 text-sm capitalize">
+                        {smartAnalysis.time_focus.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-pink-400 rounded-full"></div>
+                      <span className="text-pink-200 text-sm">
+                        {smartAnalysis.geographic_scope}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold text-[var(--text-primary)] mb-2">Confidence</h4>
-                <div className="flex items-center space-x-2">
-                  <div className="flex-1 bg-[var(--border-color)] rounded-full h-2">                    <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${(smartAnalysis.confidence || 0.5) * 100}%` }}
-                    />
+              {/* Confidence Panel with Advanced Visualization */}
+              <div className="relative bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl p-4 overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-400/50 to-transparent animate-pulse" style={{animationDelay: '0.6s'}}></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" style={{animationDelay: '0.6s'}}></div>
+                    <h4 className="font-semibold text-green-300 text-sm">AI Confidence</h4>
                   </div>
-                  <span className="text-sm font-medium text-[var(--text-primary)]">
-                    {Math.round((smartAnalysis.confidence || 0.5) * 100)}%
-                  </span>
+                  
+                  <div className="space-y-3">
+                    {/* Circular progress indicator */}
+                    <div className="flex items-center justify-between">
+                      <div className="relative w-12 h-12">
+                        <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 24 24">
+                          <circle 
+                            cx="12" 
+                            cy="12" 
+                            r="8" 
+                            fill="none" 
+                            stroke="rgb(34 197 94 / 0.2)" 
+                            strokeWidth="2"
+                          />
+                          <circle 
+                            cx="12" 
+                            cy="12" 
+                            r="8" 
+                            fill="none" 
+                            stroke="rgb(34 197 94)" 
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeDasharray={`${(smartAnalysis.confidence || 0.5) * 50.27} 50.27`}
+                            className="transition-all duration-1000"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-green-300 font-bold text-xs">
+                            {Math.round((smartAnalysis.confidence || 0.5) * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1 ml-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="flex-1 bg-slate-700/50 rounded-full h-2 overflow-hidden">
+                            <div 
+                              className="h-2 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full transition-all duration-1000 shadow-lg shadow-green-400/50"
+                              style={{ width: `${(smartAnalysis.confidence || 0.5) * 100}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        <span className="text-slate-400 text-xs">Neural Network Accuracy</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Error Alert */}
+        {/* Futuristic Error Alert */}
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-            <div className="flex-1">
-              <div className="font-medium text-red-800 dark:text-red-200">Error</div>
-              <div className="text-sm text-red-600 dark:text-red-300">{error}</div>
+          <div className="relative overflow-hidden bg-gradient-to-r from-red-900/20 via-red-800/10 to-pink-900/20 backdrop-blur-sm border border-red-500/30 rounded-xl p-5 shadow-2xl">
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-pink-500/5 animate-pulse"></div>
+            
+            {/* Glowing border effect */}
+            <div className="absolute inset-0 rounded-xl border border-red-400/20 shadow-[0_0_20px_rgba(239,68,68,0.1)]"></div>
+            
+            <div className="relative flex items-center gap-4 z-10">
+              <div className="flex-shrink-0 p-2 bg-red-500/20 rounded-lg border border-red-400/30">
+                <AlertCircle className="h-5 w-5 text-red-400 animate-pulse" />
+              </div>
+              
+              <div className="flex-1">
+                <div className="font-semibold text-red-300 mb-1 flex items-center gap-2">
+                  System Alert
+                  <div className="w-2 h-2 bg-red-400 rounded-full animate-ping"></div>
+                </div>
+                <div className="text-sm text-red-200/80">{error}</div>
+              </div>
+              
+              {/* Futuristic close button */}
+              <button 
+                onClick={() => setError(null)}
+                className="group relative p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-400/30 hover:border-red-400/60 rounded-lg transition-all duration-300 hover:scale-110"
+              >
+                {/* Button glow effect */}
+                <div className="absolute inset-0 bg-red-400/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                
+                <div className="relative text-red-400 group-hover:text-red-300 transition-colors duration-300 text-lg font-bold leading-none">
+                  ×
+                </div>
+              </button>
             </div>
-            <button 
-              onClick={() => setError(null)}
-              className="text-red-500 hover:text-red-700 transition-colors"
-            >
-              ×
-            </button>
           </div>
         )}
 
@@ -647,6 +948,141 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
           onFilterChange={handleFilterChange}
           className="mb-6"
         />
+
+        {/* Ultra-Futuristic View Mode Toggle - Above Charts - Expanded */}
+        <div className="flex justify-center mb-8">
+          <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-2 rounded-xl border border-slate-600/50 shadow-2xl overflow-hidden">
+            {/* Enhanced background matrix effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/8 via-purple-500/15 to-blue-500/8 animate-pulse"></div>
+            
+            {/* Enhanced circuit board pattern */}
+            <div className="absolute inset-0 opacity-25">
+              <div className="absolute top-1 left-2 w-px h-4 bg-blue-400"></div>
+              <div className="absolute top-1 left-2 w-4 h-px bg-blue-400"></div>
+              <div className="absolute bottom-1 right-2 w-px h-4 bg-purple-400"></div>
+              <div className="absolute bottom-1 right-2 w-4 h-px bg-purple-400"></div>
+              {/* Additional circuit elements */}
+              <div className="absolute top-3 left-8 w-2 h-px bg-cyan-400/60"></div>
+              <div className="absolute bottom-3 right-8 w-2 h-px bg-pink-400/60"></div>
+            </div>
+            
+            {/* Expanded animated toggle indicator - Transform-based positioning for perfect alignment */}
+            <div className={`absolute top-2 h-10 w-28 rounded-lg shadow-xl transition-all duration-500 ease-out transform ${
+              viewMode === "tabs" ? "translate-x-2" : "translate-x-32"
+            }`}>
+              {/* Enhanced primary glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg"></div>
+              {/* Enhanced secondary glow layer */}
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-pink-400 rounded-lg opacity-60 animate-pulse"></div>
+              {/* Enhanced holographic overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent rounded-lg transform skew-x-12 animate-pulse"></div>
+              {/* Enhanced border highlight */}
+              <div className="absolute inset-0 border-2 border-white/40 rounded-lg"></div>
+              {/* Additional glow effects */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-lg blur-sm"></div>
+            </div>
+            
+            {/* Enhanced data flow lines */}
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-400/60 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
+            
+            {/* Side glow effects */}
+            <div className="absolute left-0 top-0 h-full w-0.5 bg-gradient-to-b from-transparent via-cyan-400/50 to-transparent animate-pulse" style={{animationDelay: '0.25s'}}></div>
+            <div className="absolute right-0 top-0 h-full w-0.5 bg-gradient-to-b from-transparent via-pink-400/50 to-transparent animate-pulse" style={{animationDelay: '0.75s'}}></div>
+            
+            <div className="relative flex gap-2 z-10">
+              <button
+                className={`flex items-center gap-3 px-5 py-2.5 rounded-lg transition-all duration-500 font-semibold relative overflow-hidden ${
+                  viewMode === "tabs" 
+                    ? "text-white transform scale-105 shadow-lg" 
+                    : "text-slate-400 hover:text-slate-200 hover:scale-102"
+                }`}
+                onClick={() => setViewMode("tabs")}
+              >
+                {/* Enhanced button background effect */}
+                {viewMode !== "tabs" && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-slate-700/60 to-slate-600/60 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                )}
+                
+                {/* Enhanced icon with effects */}
+                <div className="relative">
+                  <Layers size={18} className={viewMode === "tabs" ? "animate-pulse text-cyan-200" : "transition-colors duration-300"} />
+                  {viewMode === "tabs" && (
+                    <div className="absolute inset-0 animate-ping">
+                      <Layers size={18} className="text-cyan-400 opacity-30" />
+                    </div>
+                  )}
+                  {/* Icon glow effect */}
+                  <div className={`absolute -inset-1 rounded-full transition-opacity duration-300 ${
+                    viewMode === "tabs" ? "bg-cyan-400/20 blur-sm opacity-100" : "opacity-0"
+                  }`}></div>
+                </div>
+                
+                <span className={`relative transition-all duration-300 text-base font-bold ${
+                  viewMode === "tabs" ? "text-white font-bold tracking-wider" : "tracking-normal"
+                }`}>
+                  Tabs View
+                </span>
+                
+                {/* Enhanced active indicator */}
+                {viewMode === "tabs" && (
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/50"></div>
+                    <div className="w-1 h-1 bg-cyan-300 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                )}
+              </button>
+
+              <button
+                className={`flex items-center gap-3 px-5 py-2.5 rounded-lg transition-all duration-500 font-semibold relative overflow-hidden ${
+                  viewMode === "grid" 
+                    ? "text-white transform scale-105 shadow-lg" 
+                    : "text-slate-400 hover:text-slate-200 hover:scale-102"
+                }`}
+                onClick={() => setViewMode("grid")}
+              >
+                {/* Enhanced button background effect */}
+                {viewMode !== "grid" && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-slate-700/60 to-slate-600/60 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                )}
+                
+                {/* Enhanced icon with effects */}
+                <div className="relative">
+                  <LayoutGrid size={18} className={viewMode === "grid" ? "animate-pulse text-purple-200" : "transition-colors duration-300"} />
+                  {viewMode === "grid" && (
+                    <div className="absolute inset-0 animate-ping">
+                      <LayoutGrid size={18} className="text-purple-400 opacity-30" />
+                    </div>
+                  )}
+                  {/* Icon glow effect */}
+                  <div className={`absolute -inset-1 rounded-full transition-opacity duration-300 ${
+                    viewMode === "grid" ? "bg-purple-400/20 blur-sm opacity-100" : "opacity-0"
+                  }`}></div>
+                </div>
+                
+                <span className={`relative transition-all duration-300 text-base font-bold ${
+                  viewMode === "grid" ? "text-white font-bold tracking-wider" : "tracking-normal"
+                }`}>
+                  Grid View
+                </span>
+                
+                {/* Enhanced active indicator */}
+                {viewMode === "grid" && (
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse shadow-lg shadow-purple-400/50"></div>
+                    <div className="w-1 h-1 bg-purple-300 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                )}
+              </button>
+            </div>
+            
+            {/* Corner accent elements */}
+            <div className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 border-blue-400/50 rounded-tl"></div>
+            <div className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 border-purple-400/50 rounded-tr"></div>
+            <div className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 border-cyan-400/50 rounded-bl"></div>
+            <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-pink-400/50 rounded-br"></div>
+          </div>
+        </div>
 
         {/* Main Charts Section */}
         <div className="w-full">
@@ -697,7 +1133,9 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
               )}
             </motion.div>
           </AnimatePresence>
-        </div>        {/* Enhanced Simulation Results */}
+        </div>
+
+        {/* Enhanced Simulation Results */}
         <SimulationResults 
           summary={summary}
           isLoading={loading}

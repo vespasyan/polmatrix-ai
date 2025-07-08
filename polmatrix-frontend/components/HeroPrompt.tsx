@@ -30,6 +30,7 @@ export default function HeroPrompt({ onStartSimulation }: HeroPromptProps) {
   const [focusedSample, setFocusedSample] = useState<number | null>(null);
   const [charCount, setCharCount] = useState(0);
   const [languageWarning, setLanguageWarning] = useState("");
+  const [showDescription, setShowDescription] = useState(false);
   const { data, loading, run } = useSimulation();  // Function to detect if text is in English
   const isEnglish = (text: string): boolean => {
     // More comprehensive English pattern including various dashes, quotes, and symbols
@@ -276,188 +277,425 @@ export default function HeroPrompt({ onStartSimulation }: HeroPromptProps) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[90vh] text-center space-y-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="space-y-4"
-      >
-        <h1 className="text-7xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Polmatrix AI
-        </h1>
-        <h3 className="text-2xl text-gray-600 dark:text-gray-400">
-          Smart Policy Impact Analyzer
-        </h3>        <p className="text-md text-gray-500 dark:text-gray-500 max-w-xl mx-auto">
-          Ask any US policy question and get AI-powered insights with real-time data analysis across economy, health, education, and environment domains.
-        </p>
+    <div className="relative flex flex-col items-center justify-center min-h-screen text-center overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.03)_1px,transparent_1px)] bg-[size:50px_50px] animate-pulse"></div>
+        
+        {/* Floating particles */}
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-cyan-400/30 rounded-full animate-float"></div>
+        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-blue-400/40 rounded-full animate-float animation-delay-1000"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-purple-400/30 rounded-full animate-float animation-delay-2000"></div>
+        <div className="absolute top-2/3 right-1/4 w-1 h-1 bg-pink-400/40 rounded-full animate-float animation-delay-1500"></div>
+        
+        {/* Gradient orbs */}
+        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5 rounded-full blur-3xl animate-pulse animation-delay-500"></div>
+      </div>
+
+      {/* Content wrapper - centered vertically */}
+      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="space-y-4 mb-8"
+        >
+        <div className="relative">
+          {/* Holographic effect background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-2xl animate-pulse"></div>
+          
+          {/* Main title with multiple layers for visibility */}
+          <h1 className="relative text-6xl font-black">
+            {/* Background glow layer */}
+            <span className="absolute inset-0 text-white opacity-20 blur-sm">
+              Simulation AI
+            </span>
+            
+            {/* Main gradient text */}
+            <span className="relative inline-block bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent gradient-text-fallback text-glow">
+              Simulation AI
+            </span>
+            
+            {/* Fallback solid color text (hidden when gradient works) */}
+            <span className="absolute inset-0 text-cyan-300 opacity-0 hover:opacity-100 transition-opacity duration-300">
+              Simulation AI
+            </span>
+            
+            {/* Glowing underline effect */}
+            <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-600 rounded-full opacity-70 animate-pulse shadow-lg"></div>
+          </h1>
+        </div>
+        
+        <div className="relative">
+          {/* Subtitle with enhanced visibility */}
+          <h3 className="text-xl md:text-xl lg:text-xl font-bold">
+            {/* Background glow for subtitle */}
+            <span className="absolute inset-0 text-slate-200 opacity-30 blur-sm">
+              Smart Policy Impact Analyzer
+            </span>
+            
+            {/* Main subtitle text */}
+            <span className="relative bg-gradient-to-r from-slate-100 via-cyan-200 to-slate-100 bg-clip-text text-transparent text-glow-white">
+              Smart Policy Impact Analyzer
+            </span>
+            
+            {/* Fallback solid color text */}
+            <span className="absolute inset-0 text-slate-200 opacity-0 hover:opacity-100 transition-opacity duration-300">
+              Smart Policy Impact Analyzer
+            </span>
+            
+            {/* Scan line effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent animate-pulse"></div>
+          </h3>
+        </div>
+        
+        {/* Collapsible Description */}
+        <div className="flex justify-center">
+          <motion.button
+            onClick={() => setShowDescription(!showDescription)}
+            className="relative flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-600/30 bg-slate-900/20 backdrop-blur-md hover:bg-slate-800/30 hover:border-cyan-400/40 transition-all duration-300 text-slate-300 hover:text-cyan-400 group"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+          <Sparkles size={14} className="text-cyan-400" />
+          <span className="text-sm font-medium">
+            {showDescription ? 'Hide Details' : 'Show AI Details'}
+          </span>
+          <motion.div
+            animate={{ rotate: showDescription ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <ArrowRight size={12} className="rotate-90" />
+          </motion.div>
+        </motion.button>
+        </div>
+        
+        <AnimatePresence>
+          {showDescription && (
+            <motion.div 
+              className="relative backdrop-blur-xs bg-white/5 dark:bg-black/100 border border-white/10 rounded-xl p-4 max-w-xl mx-auto"
+              initial={{ opacity: 0, height: 0, scale: 0.95 }}
+              animate={{ opacity: 1, height: "auto", scale: 1 }}
+              exit={{ opacity: 0, height: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-sm text-slate-500 dark:text-slate-300 leading-relaxed">
+                <span className="text-cyan-400 font-semibold">Neural-powered insights</span> meet 
+                <span className="text-grey-400 font-semibold"> real-time analytics</span>.
+                Ask any US policy question and witness AI transform complex data into 
+                <span className="text-grey-400 font-semibold"> actionable intelligence</span> across 
+                economy, health, education, and environment domains.
+              </p>
+              {/* Floating particles effect */}
+              <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping"></div>
+              <div className="absolute bottom-1 left-1 w-1 h-1 bg-purple-400 rounded-full animate-ping animation-delay-300"></div>
+              <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping animation-delay-700"></div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
       
-      {/* Input Section */}      <motion.div 
-        className="w-full max-w-2xl relative"
+      {/* Main Input Section - Centered */}      
+      <motion.div 
+        className="w-full max-w-2xl relative group mb-4"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        whileHover={{ scale: 1.02 }}
-      >        <motion.input
+        whileHover={{ scale: 1.01 }}
+      >
+        {/* Holographic border effect */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-sm group-hover:blur-md transition-all duration-500"></div>
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-purple-500/30 animate-pulse"></div>
+        
+        {/* Scanning line effect */}
+        <div className="absolute inset-0 rounded-full overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
+          <div className="absolute bottom-0 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent animate-pulse animation-delay-500"></div>
+        </div>
+        
+        <motion.input
           type="text"
-          placeholder="Ask a US policy question... (e.g., How does US education spending affect economic growth?)"
+          placeholder="◉ Initialize neural query interface... (e.g., How does US education spending affect economic growth?)"
           value={inputValue}
           onChange={handleInputChange}
-          disabled={loading}className={`w-full px-6 py-4 pr-24 rounded-full border-2 ${
+          disabled={loading}
+          className={`relative w-full px-6 py-4 pr-24 rounded-full border-2 backdrop-blur-md ${
             loading 
-              ? 'border-blue-300 dark:border-blue-600' 
+              ? 'border-cyan-400/50 bg-slate-900/40 shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
               : languageWarning
-              ? 'border-red-300 dark:border-red-600 focus:border-red-500'
-              : 'border-gray-200 dark:border-gray-700 focus:border-blue-500'
-          } bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 ${
-            languageWarning ? 'focus:ring-red-500' : 'focus:ring-blue-500'
-          } text-gray-900 dark:text-white placeholder:text-gray-400 shadow-lg transition-all duration-200 ${
-            loading ? 'opacity-75 cursor-not-allowed' : ''
-          }`}          onKeyPress={(e) => {
+              ? 'border-red-400/50 bg-red-900/20 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+              : 'border-slate-600/30 bg-slate-900/30 hover:bg-slate-800/40 shadow-[0_0_15px_rgba(30,41,59,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]'
+          } focus:outline-none focus:ring-2 focus:ring-cyan-400/50 text-slate-100 placeholder:text-slate-400 transition-all duration-500 ${
+            loading ? 'opacity-90 cursor-not-allowed animate-pulse' : ''
+          } font-mono text-base`}
+          onKeyPress={(e) => {
             if (e.key === 'Enter' && !loading && inputValue.trim() && isCompleteQuestion(inputValue.trim()) && !languageWarning) handleSend();
           }}
           animate={{
             boxShadow: loading 
-              ? "0 0 20px rgba(59, 130, 246, 0.3)" 
+              ? "0 0 30px rgba(34, 211, 238, 0.4)" 
               : languageWarning
-              ? "0 0 15px rgba(239, 68, 68, 0.3)"
-              : "0 10px 25px rgba(0, 0, 0, 0.1)"
+              ? "0 0 20px rgba(239, 68, 68, 0.4)"
+              : "0 10px 25px rgba(0, 0, 0, 0.2)"
           }}
         />
 
-        {/* Language Warning */}
+        {/* Neural network visualization */}
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+          <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"></div>
+          <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse animation-delay-200"></div>
+          <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse animation-delay-400"></div>
+        </div>
+
+        {/* Enhanced Language Warning */}
         <AnimatePresence>
           {languageWarning && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full left-0 right-0 mt-2 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2 text-red-600 dark:text-red-400 text-sm"
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              className="absolute top-full left-0 right-0 mt-3 px-4 py-3 bg-gradient-to-r from-red-900/30 to-red-800/30 backdrop-blur-md border border-red-500/30 rounded-xl flex items-center gap-2 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.2)] z-50"
             >
-              <AlertTriangle size={16} />
-              {languageWarning}
+              <div className="w-5 h-5 bg-red-500/20 rounded-full flex items-center justify-center">
+                <AlertTriangle size={14} className="text-red-400" />
+              </div>
+              <span className="font-medium text-sm">{languageWarning}</span>
+              <div className="ml-auto w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse"></div>
             </motion.div>
           )}
-        </AnimatePresence><div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center">
-          <button 
+        </AnimatePresence>
+
+        {/* Enhanced Action Buttons */}
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+          <motion.button 
             onClick={handleAttach}
             disabled={loading}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition mr-1 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Attach file"
+            className="p-2 rounded-full bg-slate-800/50 hover:bg-slate-700/60 border border-slate-600/30 backdrop-blur-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <Paperclip size={18} className="text-gray-500" />
-          </button>          <button 
+            <Paperclip size={16} className="text-slate-300 group-hover:text-cyan-400 transition-colors" />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </motion.button>
+          
+          <motion.button 
             onClick={handleSend}
             disabled={loading || !inputValue.trim() || !isCompleteQuestion(inputValue.trim()) || !!languageWarning}
-            className={`p-2 rounded-full transition disabled:cursor-not-allowed ${
+            className={`p-2 rounded-full transition-all duration-300 disabled:cursor-not-allowed relative overflow-hidden ${
               inputValue.trim() && !loading && !languageWarning && isCompleteQuestion(inputValue.trim())
-                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' 
-                : 'bg-gray-200 dark:bg-gray-600 text-gray-400 hover:bg-gray-300'
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_15px_rgba(34,211,238,0.3)] hover:shadow-[0_0_20px_rgba(34,211,238,0.4)]' 
+                : 'bg-slate-700/50 border border-slate-600/30 text-slate-400 hover:bg-slate-600/50'
             } ${loading ? 'animate-pulse' : ''}`}
-            aria-label="Send message"
+            whileHover={inputValue.trim() && !loading && !languageWarning && isCompleteQuestion(inputValue.trim()) ? { scale: 1.05 } : {}}
+            whileTap={inputValue.trim() && !loading && !languageWarning && isCompleteQuestion(inputValue.trim()) ? { scale: 0.95 } : {}}
           >
             {loading ? (
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-[18px] h-[18px] border-2 border-current border-t-transparent rounded-full"
+                className="w-[16px] h-[16px] border-2 border-current border-t-transparent rounded-full"
               />
             ) : (
-              <Send size={18} />
+              <Send size={16} />
             )}
-          </button>
+            
+            {/* Pulse effect for active button */}
+            {inputValue.trim() && !loading && !languageWarning && isCompleteQuestion(inputValue.trim()) && (
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400/20 to-blue-400/20 animate-pulse"></div>
+            )}
+          </motion.button>
         </div>
-      </motion.div>{/* Sample Questions Toggle Button */}
+      </motion.div>
+
+      {/* Sample Questions Toggle - Compact */}
       <motion.button
         onClick={() => setShowSampleQuestions(!showSampleQuestions)}
-        className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 text-sm text-gray-600 dark:text-gray-400"
+        className="relative flex items-center gap-2 px-4 py-2 rounded-full border border-slate-600/30 bg-slate-900/20 backdrop-blur-md hover:bg-slate-800/30 hover:border-cyan-400/40 transition-all duration-300 text-slate-300 hover:text-cyan-400 group overflow-hidden"
+        style={{ marginTop: languageWarning ? '60px' : '12px' }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.98 }}
       >
-        {showSampleQuestions ? <X size={16} /> : <Menu size={16} />}
-        {showSampleQuestions ? 'Hide' : 'Show'} sample questions
+        {/* Background gradient effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        {/* Icon with rotation effect */}
+        <motion.div
+          animate={{ rotate: showSampleQuestions ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {showSampleQuestions ? <X size={14} /> : <Menu size={14} />}
+        </motion.div>
+        
+        <span className="relative font-medium text-sm">
+          {showSampleQuestions ? 'Close Neural Samples' : 'Access Neural Samples'}
+        </span>
+        
+        {/* Holographic dots */}
+        <div className="flex gap-0.5">
+          <div className="w-0.5 h-0.5 bg-cyan-400 rounded-full animate-pulse"></div>
+          <div className="w-0.5 h-0.5 bg-blue-400 rounded-full animate-pulse animation-delay-200"></div>
+          <div className="w-0.5 h-0.5 bg-purple-400 rounded-full animate-pulse animation-delay-400"></div>
+        </div>
       </motion.button>
 
-      {/* Sample Questions */}
+      {/* Sample Questions - Compact Layout */}
       <AnimatePresence>
         {showSampleQuestions && (
           <motion.div 
-            className="flex flex-wrap justify-center gap-3 mt-6 max-w-4xl"
+            className="flex flex-wrap justify-center gap-2 mb-4 max-w-3xl"
+            style={{ marginTop: '16px' }}
             initial={{ opacity: 0, y: -20, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -20, height: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <p className="w-full text-center text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Try these sample questions:
-            </p>            {samplePrompts.map((prompt, idx) => (
+            <div className="w-full text-center mb-3 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent h-px top-1/2"></div>
+              <p className="relative inline-block bg-slate-900 px-3 text-slate-300 font-medium text-xs">
+                <span className="text-cyan-400">◉</span> Neural Query Samples
+              </p>
+            </div>
+            
+            {samplePrompts.map((prompt, idx) => (
               <motion.button
                 key={idx}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.9 }}
                 transition={{ duration: 0.4, delay: idx * 0.1 }}
-                className={`text-sm px-4 py-2 rounded-full border transition-all duration-200 cursor-pointer ${
+                className={`relative group text-xs px-3 py-2 rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-sm ${
                   focusedSample === idx
-                    ? 'border-blue-500 text-blue-600 bg-blue-50 dark:bg-blue-900/30 shadow-md'
-                    : 'border-gray-300 dark:border-gray-600 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    ? 'border-cyan-400/50 text-cyan-300 bg-slate-800/50 shadow-[0_0_10px_rgba(34,211,238,0.2)]'
+                    : 'border-slate-600/30 text-slate-300 bg-slate-900/20 hover:border-cyan-400/40 hover:text-cyan-400 hover:bg-slate-800/40 hover:shadow-[0_0_8px_rgba(34,211,238,0.1)]'
                 } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={() => !loading && handleSampleClick(prompt.text)}
                 onMouseEnter={() => setFocusedSample(idx)}
                 onMouseLeave={() => setFocusedSample(null)}
                 disabled={loading}
-                whileHover={!loading ? { scale: 1.05, y: -2 } : {}}
-                whileTap={!loading ? { scale: 0.98 } : {}}
+                whileHover={!loading ? { scale: 1.01, y: -1 } : {}}
+                whileTap={!loading ? { scale: 0.99 } : {}}
               >
-                {prompt.text}
+                {/* Background gradient effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                {/* Content */}
+                <span className="relative font-medium">{prompt.text}</span>
+                
+                {/* Corner indicators */}
+                <div className="absolute top-0.5 right-0.5 w-0.5 h-0.5 bg-cyan-400/30 rounded-full group-hover:bg-cyan-400 transition-colors duration-300"></div>
+                
+                {/* Scan line effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent"></div>
+                </div>
               </motion.button>
             ))}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Action Buttons */}
-          {/* Feature Highlights */}
+      {/* Feature Highlights - Compact */}
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl"
+        className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
-      >        <div className="text-center p-4">
-          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">🧠</span>
+      >
+        <motion.div 
+          className="relative text-center p-4 rounded-xl border border-slate-600/30 bg-slate-900/20 backdrop-blur-md hover:border-cyan-400/40 hover:bg-slate-800/30 transition-all duration-500 group overflow-hidden"
+          whileHover={{ scale: 1.02, y: -2 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          
+          {/* Icon container */}
+          <div className="relative w-10 h-10 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all duration-500">
+            <div className="w-6 h-6 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-md flex items-center justify-center text-sm animate-pulse">
+              🧠
+            </div>
+            {/* Orbital rings */}
+            <div className="absolute inset-0 rounded-lg border border-cyan-400/20 animate-spin-slow"></div>
           </div>
-          <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">AI-Powered Analysis</h4>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
-            Advanced AI understands your policy questions and provides contextual insights
+          
+          <h4 className="font-bold text-base bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+            Neural Intelligence
+          </h4>
+          <p className="text-slate-300 text-xs leading-relaxed">
+            Advanced AI consciousness with 
+            <span className="text-cyan-400 font-medium"> contextual insights</span>
           </p>
-        </div>
+          
+          {/* Corner decorations */}
+          <div className="absolute top-1.5 right-1.5 w-1 h-1 bg-cyan-400 rounded-full animate-pulse"></div>
+        </motion.div>
         
-        <div className="text-center p-4">
-          <div className="w-8 h-8 bg-green-50 dark:bg-green-900/30 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">📊</span>
+        <motion.div 
+          className="relative text-center p-4 rounded-xl border border-slate-600/30 bg-slate-900/20 backdrop-blur-md hover:border-emerald-400/40 hover:bg-slate-800/30 transition-all duration-500 group overflow-hidden"
+          whileHover={{ scale: 1.02, y: -2 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          
+          {/* Icon container */}
+          <div className="relative w-10 h-10 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-500">
+            <div className="w-6 h-6 bg-gradient-to-br from-emerald-400 to-green-500 rounded-md flex items-center justify-center text-sm animate-pulse">
+              📊
+            </div>
+            {/* Data flow lines */}
+            <div className="absolute inset-0 rounded-lg border border-emerald-400/20 animate-pulse"></div>
           </div>
-          <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Real-Time Data</h4>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
-            Access live data across economy, health, education, and environment domains
+          
+          <h4 className="font-bold text-base bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent mb-2">
+            Quantum Data Stream
+          </h4>
+          <p className="text-slate-300 text-xs leading-relaxed">
+            Real-time processing across 
+            <span className="text-emerald-400 font-medium"> multi-dimensional domains</span>
           </p>
-        </div>
+          
+          {/* Corner decorations */}
+          <div className="absolute top-1.5 right-1.5 w-1 h-1 bg-emerald-400 rounded-full animate-pulse"></div>
+        </motion.div>
         
-        <div className="text-center p-4">
-          <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">🎯</span>
+        <motion.div 
+          className="relative text-center p-4 rounded-xl border border-slate-600/30 bg-slate-900/20 backdrop-blur-md hover:border-purple-400/40 hover:bg-slate-800/30 transition-all duration-500 group overflow-hidden"
+          whileHover={{ scale: 1.02, y: -2 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          
+          {/* Icon container */}
+          <div className="relative w-10 h-10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-500">
+            <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-500 rounded-md flex items-center justify-center text-sm animate-pulse">
+              🎯
+            </div>
+            {/* Target rings */}
+            <div className="absolute inset-0 rounded-lg border border-purple-400/20 animate-pulse"></div>
           </div>
-          <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Actionable Insights</h4>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
-            Get evidence-based recommendations and policy impact predictions
+          
+          <h4 className="font-bold text-base bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-2">
+            Precision Targeting
+          </h4>
+          <p className="text-slate-300 text-xs leading-relaxed">
+            Evidence-based recommendations with 
+            <span className="text-purple-400 font-medium"> predictive modeling</span>
           </p>
-        </div>
+          
+          {/* Corner decorations */}
+          <div className="absolute top-1.5 right-1.5 w-1 h-1 bg-purple-400 rounded-full animate-pulse"></div>
+        </motion.div>
       </motion.div>
+      </div>
       
     </div>
   );
