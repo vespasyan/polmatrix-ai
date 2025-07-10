@@ -17,7 +17,7 @@ import {
   TooltipProps,
 } from "recharts"
 import { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent"
-import { Share2, Download, BarChart2, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Check, Info, Heart, ChevronDown, ChevronUp } from 'lucide-react'
+import { Share2, Download, BarChart2, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Check, Info, Heart, ChevronDown, ChevronUp, HeartPulse, Activity, TrendingUp, Eye, EyeOff, Maximize2, Settings, Play, Pause, Stethoscope, Shield, Zap } from 'lucide-react'
 import { metricsConfig } from "@/lib/metricsConfig"
 
 type ChartType = "bar" | "line" | "area"
@@ -30,7 +30,10 @@ type Props = {
 
 const generateColor = (index: number) => {
   const colors = [
-    "#EF4444", "#F97316", "#F59E0B", "#EAB308", "#84CC16", "#22C55E", "#10B981", "#14B8A6"
+    "#EF4444", "#F97316", "#F59E0B", "#EAB308", 
+    "#DC2626", "#B91C1C", "#991B1B", "#7F1D1D",
+    "#FF6B6B", "#FF8E53", "#FF6B35", "#FF4757",
+    "#FF3838", "#FF2D92", "#FF6348", "#FF7675"
   ]
   return colors[index % colors.length]
 }
@@ -52,27 +55,34 @@ const metricMap: Record<string, { label: string; color: string; description: str
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[var(--card-bg)] p-4 rounded-lg shadow-xl border border-[var(--border-color)] backdrop-blur-sm">
-        <p className="font-semibold text-[var(--text-primary)] mb-2">{label}</p>
-        {payload.map((entry, index) => {
-          const metricKey = entry.dataKey as string
-          const metricConfig = metricMap[metricKey]
-          return (
-            <div key={index} className="flex items-center gap-2 mb-1">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="text-[var(--text-secondary)] text-sm">
-                {metricConfig?.label || metricKey}:
-              </span>
-              <span className="font-medium text-[var(--text-primary)]">
-                {typeof entry.value === 'number' ? entry.value.toFixed(2) : entry.value}
-                {metricConfig?.unit && ` ${metricConfig.unit}`}
-              </span>
-            </div>
-          )
-        })}
+      <div className="bg-black/90 backdrop-blur-xl p-6 rounded-2xl shadow-2xl border border-red-500/30 relative overflow-hidden">
+        {/* Glowing border effect */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-500/20 to-orange-500/20 blur-xl"></div>
+        <div className="relative">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+            <p className="font-bold text-white text-lg tracking-wide">{label}</p>
+          </div>
+          {payload.map((entry, index) => {
+            const metricKey = entry.dataKey as string
+            const metricConfig = metricMap[metricKey]
+            return (
+              <div key={index} className="flex items-center gap-3 mb-2 last:mb-0">
+                <div 
+                  className="w-4 h-4 rounded-full shadow-lg animate-pulse" 
+                  style={{ backgroundColor: entry.color, boxShadow: `0 0 10px ${entry.color}` }}
+                />
+                <span className="text-gray-300 text-sm font-medium min-w-0 flex-1">
+                  {metricConfig?.label || metricKey}:
+                </span>
+                <span className="font-bold text-white text-sm bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
+                  {typeof entry.value === 'number' ? entry.value.toFixed(2) : entry.value}
+                  {metricConfig?.unit && ` ${metricConfig.unit}`}
+                </span>
+              </div>
+            )
+          })}
+        </div>
       </div>
     )
   }
@@ -83,6 +93,8 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
   const [chartType, setChartType] = useState<ChartType>("line")
   const [isExporting, setIsExporting] = useState(false)
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(true)
+  const [showAdvancedControls, setShowAdvancedControls] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
 
   const handleShare = useCallback(async () => {
@@ -172,33 +184,59 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
     }
 
     const commonProps = {
-      strokeWidth: 2,
-      dot: { strokeWidth: 2, r: 4 },
-      activeDot: { r: 6, strokeWidth: 0 }
+      strokeWidth: 3,
+      dot: { 
+        strokeWidth: 2, 
+        r: 5,
+        fill: '#fff',
+        stroke: '#EF4444',
+        filter: 'drop-shadow(0 0 6px rgba(239, 68, 68, 0.6))'
+      },
+      activeDot: { 
+        r: 8, 
+        strokeWidth: 0,
+        fill: '#EF4444',
+        filter: 'drop-shadow(0 0 12px rgba(239, 68, 68, 0.8))'
+      }
     }
 
     switch (chartType) {
       case "bar":
         return (
           <BarChart {...chartProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" opacity={0.3} />
+            <defs>
+              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#EF4444" stopOpacity="0.8"/>
+                <stop offset="100%" stopColor="#DC2626" stopOpacity="0.9"/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke="rgba(239, 68, 68, 0.2)" 
+              opacity={0.5}
+            />
             <XAxis 
               dataKey="label" 
-              stroke="var(--text-secondary)"
+              stroke="#EF4444"
               fontSize={12}
-              tickLine={{ stroke: "var(--border-color)" }}
+              fontWeight="600"
+              tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
             />
             <YAxis 
-              stroke="var(--text-secondary)"
+              stroke="#EF4444"
               fontSize={12}
-              tickLine={{ stroke: "var(--border-color)" }}
+              fontWeight="600"
+              tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               wrapperStyle={{ 
                 paddingTop: "20px",
                 fontSize: "12px",
-                color: "var(--text-secondary)"
+                color: "#EF4444",
+                fontWeight: "600"
               }}
             />
             {selectedMetrics.map((metric, index) => (
@@ -207,7 +245,10 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
                 dataKey={metric} 
                 fill={generateColor(index)}
                 name={metricMap[metric]?.label || metric}
-                radius={[2, 2, 0, 0]}
+                radius={[4, 4, 0, 0]}
+                style={{
+                  filter: `drop-shadow(0 0 8px ${generateColor(index)}40)`
+                }}
               />
             ))}
           </BarChart>
@@ -215,24 +256,41 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
       case "area":
         return (
           <AreaChart {...chartProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" opacity={0.3} />
+            <defs>
+              {selectedMetrics.map((metric, index) => (
+                <linearGradient key={metric} id={`areaGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={generateColor(index)} stopOpacity="0.8"/>
+                  <stop offset="100%" stopColor={generateColor(index)} stopOpacity="0.1"/>
+                </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke="rgba(239, 68, 68, 0.2)" 
+              opacity={0.5}
+            />
             <XAxis 
               dataKey="label" 
-              stroke="var(--text-secondary)"
+              stroke="#EF4444"
               fontSize={12}
-              tickLine={{ stroke: "var(--border-color)" }}
+              fontWeight="600"
+              tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
             />
             <YAxis 
-              stroke="var(--text-secondary)"
+              stroke="#EF4444"
               fontSize={12}
-              tickLine={{ stroke: "var(--border-color)" }}
+              fontWeight="600"
+              tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               wrapperStyle={{ 
                 paddingTop: "20px",
                 fontSize: "12px",
-                color: "var(--text-secondary)"
+                color: "#EF4444",
+                fontWeight: "600"
               }}
             />
             {selectedMetrics.map((metric, index) => (
@@ -241,10 +299,25 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
                 type="monotone"
                 dataKey={metric} 
                 stroke={generateColor(index)}
-                fill={generateColor(index)}
-                fillOpacity={0.3}
+                fill={`url(#areaGradient-${index})`}
                 name={metricMap[metric]?.label || metric}
-                {...commonProps}
+                strokeWidth={3}
+                style={{
+                  filter: `drop-shadow(0 0 8px ${generateColor(index)}40)`
+                }}
+                dot={{ 
+                  strokeWidth: 2, 
+                  r: 4,
+                  fill: '#fff',
+                  stroke: generateColor(index),
+                  filter: `drop-shadow(0 0 6px ${generateColor(index)}60)`
+                }}
+                activeDot={{ 
+                  r: 7, 
+                  strokeWidth: 0,
+                  fill: generateColor(index),
+                  filter: `drop-shadow(0 0 12px ${generateColor(index)}80)`
+                }}
               />
             ))}
           </AreaChart>
@@ -252,24 +325,39 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
       default:
         return (
           <LineChart {...chartProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" opacity={0.3} />
+            <defs>
+              <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#EF4444" stopOpacity="1"/>
+                <stop offset="100%" stopColor="#F97316" stopOpacity="1"/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke="rgba(239, 68, 68, 0.2)" 
+              opacity={0.5}
+            />
             <XAxis 
               dataKey="label" 
-              stroke="var(--text-secondary)"
+              stroke="#EF4444"
               fontSize={12}
-              tickLine={{ stroke: "var(--border-color)" }}
+              fontWeight="600"
+              tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
             />
             <YAxis 
-              stroke="var(--text-secondary)"
+              stroke="#EF4444"
               fontSize={12}
-              tickLine={{ stroke: "var(--border-color)" }}
+              fontWeight="600"
+              tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               wrapperStyle={{ 
                 paddingTop: "20px",
                 fontSize: "12px",
-                color: "var(--text-secondary)"
+                color: "#EF4444",
+                fontWeight: "600"
               }}
             />
             {selectedMetrics.map((metric, index) => (
@@ -279,7 +367,23 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
                 dataKey={metric} 
                 stroke={generateColor(index)}
                 name={metricMap[metric]?.label || metric}
-                {...commonProps}
+                strokeWidth={3}
+                style={{
+                  filter: `drop-shadow(0 0 8px ${generateColor(index)}40)`
+                }}
+                dot={{ 
+                  strokeWidth: 2, 
+                  r: 5,
+                  fill: '#fff',
+                  stroke: generateColor(index),
+                  filter: `drop-shadow(0 0 6px ${generateColor(index)}60)`
+                }}
+                activeDot={{ 
+                  r: 8, 
+                  strokeWidth: 0,
+                  fill: generateColor(index),
+                  filter: `drop-shadow(0 0 12px ${generateColor(index)}80)`
+                }}
               />
             ))}
           </LineChart>
@@ -289,12 +393,35 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-[400px] flex items-center justify-center bg-[var(--input-bg)] rounded-lg border border-dashed border-[var(--border-color)]">
-        <div className="text-center space-y-3">
-          <Heart className="h-12 w-12 text-[var(--text-secondary)] mx-auto opacity-50" />
-          <div>
-            <p className="text-[var(--text-primary)] font-medium">No Health Data Available</p>
-            <p className="text-[var(--text-secondary)] text-sm">Health metrics will appear here once data is loaded</p>
+      <div className="relative h-[400px] flex items-center justify-center bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-red-500/30 overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 animate-pulse"></div>
+        
+        {/* Glowing orb effect */}
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-red-500/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-orange-500/20 rounded-full blur-xl animate-pulse delay-700"></div>
+        
+        <div className="text-center space-y-4 relative z-10">
+          <div className="relative">
+            <HeartPulse className="h-16 w-16 text-red-400 mx-auto animate-pulse" />
+            <div className="absolute inset-0 h-16 w-16 text-red-400 mx-auto animate-ping opacity-20">
+              <HeartPulse className="h-16 w-16" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-white font-bold text-xl bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
+              Health Data Loading
+            </p>
+            <p className="text-gray-400 text-sm">
+              Medical analytics will appear here once data is loaded
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce delay-75"></div>
+              <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce delay-150"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -304,84 +431,168 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
   return (
     <div className="space-y-6">
       {/* Chart Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-[var(--input-bg)] rounded-lg border border-[var(--border-color)]">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Heart className="h-5 w-5 text-red-500" />
-            <h3 className="font-semibold text-[var(--text-primary)]">Health Analysis</h3>
+      <div className="relative flex flex-wrap items-center justify-between gap-4 p-6 bg-gradient-to-r from-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl border border-red-500/30 overflow-hidden">
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 animate-pulse"></div>
+        
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Stethoscope className="h-6 w-6 text-red-400 animate-pulse" />
+              <div className="absolute inset-0 h-6 w-6 text-red-400 animate-ping opacity-20">
+                <Stethoscope className="h-6 w-6" />
+              </div>
+            </div>
+            <h3 className="font-bold text-xl bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
+              Health Matrix
+            </h3>
           </div>
-          <div className="text-sm text-[var(--text-secondary)]">
-            {selectedMetrics.length} metrics • {data.length} data points
+          <div className="flex items-center gap-2 px-3 py-1 bg-black/40 rounded-full border border-red-500/30">
+            <Shield className="h-4 w-4 text-red-400" />
+            <span className="text-sm text-gray-300 font-medium">
+              {selectedMetrics.length} active • {data.length} points
+            </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4 relative z-10">
           {/* Chart Type Selector */}
-          <div className="flex rounded-lg overflow-hidden border border-[var(--border-color)]">
+          <div className="flex rounded-xl overflow-hidden border border-red-500/30 bg-black/40 backdrop-blur-sm">
             {Object.entries(chartTypeConfig).map(([type, config]) => {
               const Icon = config.icon
               return (
                 <button
                   key={type}
                   onClick={() => setChartType(type as ChartType)}
-                  className={`p-2 transition-all duration-200 ${
+                  className={`p-3 transition-all duration-300 relative group ${
                     chartType === type
-                      ? "bg-red-500 text-white"
-                      : "bg-[var(--card-bg)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]"
+                      ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg"
+                      : "text-gray-400 hover:text-red-400 hover:bg-red-500/10"
                   }`}
                   title={config.description}
                 >
-                  <Icon size={16} />
+                  <Icon size={18} className={chartType === type ? "animate-pulse" : ""} />
+                  {chartType === type && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 animate-pulse opacity-20 rounded"></div>
+                  )}
                 </button>
               )
             })}
           </div>
 
+          {/* Advanced Controls Toggle */}
+          <button
+            onClick={() => setShowAdvancedControls(!showAdvancedControls)}
+            className="p-3 rounded-xl bg-black/40 border border-red-500/30 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300"
+            title="Advanced Controls"
+          >
+            <Settings size={18} className={showAdvancedControls ? "animate-spin" : ""} />
+          </button>
+
           {/* Action Buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-3">
+            <button
+              onClick={() => setIsAnimating(!isAnimating)}
+              className="p-3 rounded-xl bg-black/40 border border-red-500/30 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300"
+              title={isAnimating ? "Pause animations" : "Resume animations"}
+            >
+              {isAnimating ? <Pause size={18} /> : <Play size={18} />}
+            </button>
             <button
               onClick={handleShare}
-              className="p-2 rounded-lg bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition-all duration-200"
-              title="Share chart"
+              className="p-3 rounded-xl bg-black/40 border border-red-500/30 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 relative group"
+              title="Share analysis"
             >
-              <Share2 size={16} />
+              <Share2 size={18} />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </button>
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="p-2 rounded-lg bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition-all duration-200 disabled:opacity-50"
-              title="Export chart"
+              className="p-3 rounded-xl bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/50 text-red-400 hover:from-red-500/30 hover:to-orange-500/30 transition-all duration-300 disabled:opacity-50 relative overflow-hidden"
+              title="Export data"
             >
-              <Download size={16} />
+              <Download size={18} className={isExporting ? "animate-bounce" : ""} />
+              {isExporting && (
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 animate-pulse"></div>
+              )}
             </button>
           </div>
         </div>
       </div>
 
+      {/* Advanced Controls Panel */}
+      {showAdvancedControls && (
+        <div className="relative p-6 bg-gradient-to-r from-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl border border-red-500/30 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 animate-pulse"></div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="h-5 w-5 text-red-400" />
+              <h4 className="font-bold text-white">Medical Analytics</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-black/40 rounded-xl border border-red-500/30">
+                <div className="text-sm text-gray-400 mb-1">Data Points</div>
+                <div className="text-2xl font-bold text-red-400">{data.length}</div>
+              </div>
+              <div className="p-4 bg-black/40 rounded-xl border border-red-500/30">
+                <div className="text-sm text-gray-400 mb-1">Active Metrics</div>
+                <div className="text-2xl font-bold text-orange-400">{selectedMetrics.length}</div>
+              </div>
+              <div className="p-4 bg-black/40 rounded-xl border border-red-500/30">
+                <div className="text-sm text-gray-400 mb-1">Chart Type</div>
+                <div className="text-2xl font-bold text-yellow-400 capitalize">{chartType}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Metrics Selection */}
-      <div className="bg-[var(--input-bg)] rounded-lg border border-[var(--border-color)]">
+      <div className="relative bg-gradient-to-r from-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl border border-red-500/30 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 animate-pulse"></div>
+        
         <button
           onClick={() => setIsMetricsExpanded(!isMetricsExpanded)}
-          className="w-full flex items-center justify-between p-4 hover:bg-[var(--hover-bg)] transition-all duration-200"
+          className="relative z-10 w-full flex items-center justify-between p-6 hover:bg-red-500/10 transition-all duration-300"
         >
-          <div className="flex items-center gap-2">
-            <Info className="h-4 w-4 text-red-500" />
-            <span className="text-sm font-medium text-[var(--text-primary)]">Available Metrics</span>
-            <span className="text-xs text-[var(--text-secondary)]">
-              ({Object.keys(metricMap).length} total, {selectedMetrics.length} selected)
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Eye className="h-5 w-5 text-red-400" />
+              {isMetricsExpanded && (
+                <div className="absolute inset-0 h-5 w-5 text-red-400 animate-ping opacity-20">
+                  <Eye className="h-5 w-5" />
+                </div>
+              )}
+            </div>
+            <span className="text-lg font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
+              Medical Metrics Hub
             </span>
+            <div className="flex items-center gap-2 px-3 py-1 bg-black/40 rounded-full border border-red-500/30">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs text-gray-300">
+                {Object.keys(metricMap).length} available • {selectedMetrics.length} selected
+              </span>
+            </div>
           </div>
-          {isMetricsExpanded ? (
-            <ChevronUp className="h-4 w-4 text-[var(--text-secondary)]" />
-          ) : (
-            <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
-          )}
+          <div className="flex items-center gap-2">
+            <div className={`w-6 h-6 rounded-full border-2 border-red-400 flex items-center justify-center transition-all duration-300 ${
+              isMetricsExpanded ? 'bg-red-400' : 'bg-transparent'
+            }`}>
+              {isMetricsExpanded ? (
+                <ChevronUp className="h-4 w-4 text-black" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-red-400" />
+              )}
+            </div>
+          </div>
         </button>
         
         {isMetricsExpanded && (
-          <div className="px-4 pb-4 border-t border-[var(--border-color)] pt-3">
-            <div className="text-xs text-[var(--text-secondary)] mb-3">
-              Click to toggle visibility
+          <div className="relative z-10 px-6 pb-6 border-t border-red-500/30">
+            <div className="text-xs text-gray-400 mb-4 flex items-center gap-2">
+              <div className="w-1 h-1 bg-red-400 rounded-full animate-pulse"></div>
+              Interactive health metrics - Click to toggle visibility
             </div>
             
             {/* Group metrics by category */}
@@ -393,30 +604,48 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
                 return acc
               }, {} as Record<string, Array<[string, typeof metricMap[string]]>>)
             ).map(([category, metrics]) => (
-              <div key={category} className="mb-4 last:mb-0">
-                <h4 className="text-xs font-semibold text-[var(--text-primary)] mb-2 uppercase tracking-wide opacity-70">
+              <div key={category} className="mb-6 last:mb-0">
+                <h4 className="text-sm font-bold text-red-400 mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <div className="w-2 h-2 bg-gradient-to-r from-red-400 to-orange-400 rounded-full"></div>
                   {category}
                 </h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {metrics.map(([key, metric]) => {
                     const isSelected = selectedMetrics.includes(key)
+                    const color = generateColor(selectedMetrics.indexOf(key))
                     return (
                       <button
                         key={key}
                         onClick={() => onToggleMetric(key)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 overflow-hidden ${
                           isSelected
-                            ? "bg-red-500 text-white shadow-md"
-                            : "bg-[var(--card-bg)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]"
+                            ? "bg-gradient-to-r from-red-500/20 to-orange-500/20 text-white border border-red-500/50 shadow-lg"
+                            : "bg-black/40 text-gray-400 border border-gray-700/50 hover:text-white hover:bg-gray-800/60 hover:border-red-500/30"
                         }`}
+                        style={isSelected ? {
+                          boxShadow: `0 0 20px ${color}20`
+                        } : {}}
                       >
-                        {isSelected && <Check size={14} />}
-                        <span>{metric.label}</span>
-                        {metric.unit && (
-                          <span className={`text-xs ${isSelected ? 'text-red-100' : 'text-[var(--text-secondary)]'}`}>
-                            ({metric.unit})
-                          </span>
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 animate-pulse"></div>
                         )}
+                        <div className="relative z-10 flex items-center gap-2">
+                          {isSelected ? (
+                            <Check size={16} className="text-red-400 animate-pulse" />
+                          ) : (
+                            <EyeOff size={16} className="opacity-50" />
+                          )}
+                          <span className="text-sm">{metric.label}</span>
+                          {metric.unit && (
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              isSelected 
+                                ? 'bg-red-500/20 text-red-300' 
+                                : 'bg-gray-700/50 text-gray-500'
+                            }`}>
+                              {metric.unit}
+                            </span>
+                          )}
+                        </div>
                       </button>
                     )
                   })}
@@ -428,13 +657,38 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
       </div>
 
       {/* Chart */}
-      <div 
-        ref={chartRef}
-        className="h-[400px] p-4 bg-[var(--card-bg)] rounded-lg border border-[var(--border-color)]"
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          {renderChart()}
-        </ResponsiveContainer>
+      <div className="relative group">
+        <div 
+          ref={chartRef}
+          className="relative h-[500px] p-6 bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl border border-red-500/30 overflow-hidden"
+        >
+          {/* Animated background effects */}
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 animate-pulse"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500 animate-pulse opacity-50"></div>
+          <div className="absolute bottom-0 right-0 w-full h-1 bg-gradient-to-l from-red-500 to-orange-500 animate-pulse opacity-50"></div>
+          
+          {/* Corner decorations */}
+          <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-red-500/50 rounded-tr-lg"></div>
+          <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-red-500/50 rounded-bl-lg"></div>
+          
+          {/* Chart container */}
+          <div className="relative z-10 h-full">
+            <ResponsiveContainer width="100%" height="100%">
+              {renderChart()}
+            </ResponsiveContainer>
+          </div>
+          
+          {/* Floating action button */}
+          <button
+            className="absolute top-4 right-16 p-2 bg-black/60 backdrop-blur-sm rounded-lg border border-red-500/30 text-red-400 hover:text-white hover:bg-red-500/20 transition-all duration-300 opacity-0 group-hover:opacity-100"
+            title="Fullscreen"
+          >
+            <Maximize2 size={16} />
+          </button>
+        </div>
+        
+        {/* Subtle glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl blur-xl -z-10 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
     </div>
   )

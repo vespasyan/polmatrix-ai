@@ -72,7 +72,7 @@ export default function GlobalFilter({
   })
   
   // Main component collapse state
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(true)
 
   useEffect(() => {
     onFilterChange({

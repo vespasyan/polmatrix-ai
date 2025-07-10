@@ -1,101 +1,86 @@
 // backend/src/services/simulator.js
+const axios = require("axios");
+const db = require("../db");
 const eduModel = require('./domainModels/educationModel')
 const envModel = require('./domainModels/environmentModel')
 const ecoModel = require('./domainModels/economyModel')
 const hlthModel = require('./domainModels/healthModel')
 
-/**
- * generateSimulatorData(parsed)
- * @param parsed { time, regions, metrics, policies }
- * @returns Array of { label, region, <metricKey>: value, ... }
- */
-function generateSimulatorData(parsed) {
-  const { time, regions, metrics, policies } = parsed
-  const { startYear, periods, unit } = time
+const FORECAST_API = "http://localhost:8000/forecast";
 
-  // build labels [e.g. "2025","2026",…]
-  const labels = Array.from({ length: periods }, (_, i) =>
-    (startYear + i).toString()
-  )
+async function runSimulation({ region = "US", metrics, startYear, endYear, levers = [] }) {
+  // 1️⃣ Pull real data from facts table
+  const result = await db.query(
+    `SELECT year, metric_code, value
+     FROM facts
+     WHERE region_id = $1 AND year < $2 AND metric_code = ANY($3)
+     ORDER BY year`,
+    [region, startYear, metrics]
+  );
 
-  const rows = []
+  const history = result.rows.map(row => ({
+    year: row.year,
+    region,
+    [row.metric_code]: Number(row.value)
+  }));
 
-  regions.forEach((region) => {
-    // Initialize “lastValues” per metric
-    const last = {}
-    metrics.forEach(({ domain, metricKey }) => {
-      if (domain === 'education') {
-        last[metricKey] = eduModel.getBaseline(region)
-      }
-      if (domain === 'environment') {
-        last[metricKey] = envModel.getBaseline(region)
-      }
-      if (domain === 'economy') {
-        last[metricKey] = ecoModel.getBaseline(region, metricKey)
-      }
-      if (domain === 'health') {
-        last[metricKey] = hlthModel.getBaseline(region)
-      }
-    })
+  // 2️⃣ Estimate future baseline via Python service
+  const context = getContextFromHistory(history, metrics); // pulls latest feature values
 
-    labels.forEach((label) => {
-      const row = { label, region }
+  const future = [];
 
-      metrics.forEach(({ domain, metricKey }) => {
-        // pick model
-        let baseTrend = 0, policySum = 0
-        if (domain === 'education') {
-          baseTrend = eduModel.getTrend(region)
-          policies.forEach((p) => {
-            policySum += eduModel.applyPolicyEffect(region, p.lever, p.pct)
-          })
-        }
-        if (domain === 'environment') {
-          baseTrend = envModel.getTrend(region)
-          policies.forEach((p) => {
-            policySum += envModel.applyPolicyEffect(region, p.lever, p.pct)
-          })
-        }
-        if (domain === 'economy') {
-          baseTrend = ecoModel.getTrend(region, metricKey)
-          policies.forEach((p) => {
-            policySum += ecoModel.applyPolicyEffect(region, p.lever, p.pct, metricKey)
-          })
-        }
-        if (domain === 'health') {
-          baseTrend = hlthModel.getTrend(region)
-          policies.forEach((p) => {
-            policySum += hlthModel.applyPolicyEffect(region, p.lever, p.pct)
-          })
-        }
+  for (const metric of metrics) {
+    try {
+      const response = await axios.post(FORECAST_API, {
+        metric,
+        region,
+        startYear,
+        endYear,
+        context
+      });
 
-        // apply change + minor noise
-        const noise = (Math.random() - 0.5) * 0.1 * Math.abs(baseTrend + policySum)
-        let newVal = last[metricKey] + baseTrend + policySum + noise
+      const forecasted = response.data.map(row => ({
+        year: row.year,
+        region: row.region,
+        [metric]: applyPolicyEffect(row[metric], metric, levers, row.year - startYear)
+      }));
 
-        // clamp percentages 0-100 if needed
-        if (metricKey.includes('rate') || metricKey === 'education_rate' || metricKey === 'mental_health_rate' || metricKey === 'gdp_growth') {
-          newVal = Math.max(0, Math.min(100, newVal))
-        }
-        if (metricKey === 'co2_emissions') {
-          newVal = Math.max(0, newVal)
-        }
-        // tech_jobs is a percent too
-        if (metricKey === 'tech_jobs') {
-          newVal = Math.max(0, Math.min(100, newVal))
-        }
+      // Merge forecasted metric into `future[]` by year
+      forecasted.forEach(pt => {
+        const yearRow = future.find(r => r.year === pt.year) || { year: pt.year, region };
+        Object.assign(yearRow, pt);
+        if (!future.includes(yearRow)) future.push(yearRow);
+      });
+    } catch (err) {
+      console.error(`Forecast failed for ${metric}:`, err.message);
+    }
+  }
 
-        row[metricKey] = parseFloat(newVal.toFixed(2))
-        last[metricKey] = newVal
-      })
-
-      rows.push(row)
-    })
-  })
-
-  return rows
+  // 3️⃣ Merge history + future
+  const merged = [...history, ...future].sort((a, b) => a.year - b.year);
+  return merged;
 }
 
-module.exports = { generateSimulatorData }
-// This module generates simulation data based on parsed input
-// including time, regions, metrics, and policies.
+function applyPolicyEffect(value, metric, levers, yearOffset) {
+  const decay = 1 / (1 + 0.2 * yearOffset); // simple decay curve
+  let delta = 0;
+
+  for (const lever of levers) {
+    const coeff = domainModels.getPolicyEffect(lever.name, metric);
+    if (coeff) {
+      delta += coeff * lever.magnitude * decay;
+    }
+  }
+
+  return value + delta;
+}
+
+function getContextFromHistory(history, metrics) {
+  const latest = history.filter(r => r.year === Math.max(...history.map(h => h.year)))[0];
+  return metrics.reduce((acc, m) => {
+    if (latest[m] !== undefined) acc[m] = latest[m];
+    return acc;
+  }, {});
+}
+
+module.exports = { runSimulation };

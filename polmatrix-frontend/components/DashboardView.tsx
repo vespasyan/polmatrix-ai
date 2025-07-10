@@ -943,146 +943,115 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
           </div>
         )}
 
-        {/* Filters */}
+        {/* Global Filters */}
         <GlobalFilter 
           onFilterChange={handleFilterChange}
           className="mb-6"
         />
 
-        {/* Ultra-Futuristic View Mode Toggle - Above Charts - Expanded */}
-        <div className="flex justify-center mb-8">
-          <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-2 rounded-xl border border-slate-600/50 shadow-2xl overflow-hidden">
-            {/* Enhanced background matrix effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/8 via-purple-500/15 to-blue-500/8 animate-pulse"></div>
-            
-            {/* Enhanced circuit board pattern */}
-            <div className="absolute inset-0 opacity-25">
-              <div className="absolute top-1 left-2 w-px h-4 bg-blue-400"></div>
-              <div className="absolute top-1 left-2 w-4 h-px bg-blue-400"></div>
-              <div className="absolute bottom-1 right-2 w-px h-4 bg-purple-400"></div>
-              <div className="absolute bottom-1 right-2 w-4 h-px bg-purple-400"></div>
-              {/* Additional circuit elements */}
-              <div className="absolute top-3 left-8 w-2 h-px bg-cyan-400/60"></div>
-              <div className="absolute bottom-3 right-8 w-2 h-px bg-pink-400/60"></div>
+        {/* Unified Control Panel: Policy Question & View Toggle */}
+        {initialPrompt && (
+          <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900/30 via-slate-800/40 to-violet-900/30 backdrop-blur-sm border border-indigo-500/20 rounded-xl shadow-xl p-6 mb-8">
+            {/* Animated background effects */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-3 left-6 w-1 h-1 bg-indigo-400 rounded-full animate-ping"></div>
+              <div className="absolute top-8 right-12 w-1 h-1 bg-violet-400 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
+              <div className="absolute bottom-6 left-16 w-1 h-1 bg-blue-400 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
             </div>
-            
-            {/* Expanded animated toggle indicator - Transform-based positioning for perfect alignment */}
-            <div className={`absolute top-2 h-10 w-28 rounded-lg shadow-xl transition-all duration-500 ease-out transform ${
-              viewMode === "tabs" ? "translate-x-2" : "translate-x-32"
-            }`}>
-              {/* Enhanced primary glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg"></div>
-              {/* Enhanced secondary glow layer */}
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-pink-400 rounded-lg opacity-60 animate-pulse"></div>
-              {/* Enhanced holographic overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent rounded-lg transform skew-x-12 animate-pulse"></div>
-              {/* Enhanced border highlight */}
-              <div className="absolute inset-0 border-2 border-white/40 rounded-lg"></div>
-              {/* Additional glow effects */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-lg blur-sm"></div>
-            </div>
-            
-            {/* Enhanced data flow lines */}
-            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-400/60 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
-            
-            {/* Side glow effects */}
-            <div className="absolute left-0 top-0 h-full w-0.5 bg-gradient-to-b from-transparent via-cyan-400/50 to-transparent animate-pulse" style={{animationDelay: '0.25s'}}></div>
-            <div className="absolute right-0 top-0 h-full w-0.5 bg-gradient-to-b from-transparent via-pink-400/50 to-transparent animate-pulse" style={{animationDelay: '0.75s'}}></div>
-            
-            <div className="relative flex gap-2 z-10">
-              <button
-                className={`flex items-center gap-3 px-5 py-2.5 rounded-lg transition-all duration-500 font-semibold relative overflow-hidden ${
-                  viewMode === "tabs" 
-                    ? "text-white transform scale-105 shadow-lg" 
-                    : "text-slate-400 hover:text-slate-200 hover:scale-102"
-                }`}
-                onClick={() => setViewMode("tabs")}
-              >
-                {/* Enhanced button background effect */}
-                {viewMode !== "tabs" && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-slate-700/60 to-slate-600/60 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                )}
-                
-                {/* Enhanced icon with effects */}
-                <div className="relative">
-                  <Layers size={18} className={viewMode === "tabs" ? "animate-pulse text-cyan-200" : "transition-colors duration-300"} />
-                  {viewMode === "tabs" && (
-                    <div className="absolute inset-0 animate-ping">
-                      <Layers size={18} className="text-cyan-400 opacity-30" />
-                    </div>
-                  )}
-                  {/* Icon glow effect */}
-                  <div className={`absolute -inset-1 rounded-full transition-opacity duration-300 ${
-                    viewMode === "tabs" ? "bg-cyan-400/20 blur-sm opacity-100" : "opacity-0"
-                  }`}></div>
-                </div>
-                
-                <span className={`relative transition-all duration-300 text-base font-bold ${
-                  viewMode === "tabs" ? "text-white font-bold tracking-wider" : "tracking-normal"
-                }`}>
-                  Tabs View
-                </span>
-                
-                {/* Enhanced active indicator */}
-                {viewMode === "tabs" && (
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/50"></div>
-                    <div className="w-1 h-1 bg-cyan-300 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                  </div>
-                )}
-              </button>
 
-              <button
-                className={`flex items-center gap-3 px-5 py-2.5 rounded-lg transition-all duration-500 font-semibold relative overflow-hidden ${
-                  viewMode === "grid" 
-                    ? "text-white transform scale-105 shadow-lg" 
-                    : "text-slate-400 hover:text-slate-200 hover:scale-102"
-                }`}
-                onClick={() => setViewMode("grid")}
-              >
-                {/* Enhanced button background effect */}
-                {viewMode !== "grid" && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-slate-700/60 to-slate-600/60 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                )}
-                
-                {/* Enhanced icon with effects */}
-                <div className="relative">
-                  <LayoutGrid size={18} className={viewMode === "grid" ? "animate-pulse text-purple-200" : "transition-colors duration-300"} />
-                  {viewMode === "grid" && (
-                    <div className="absolute inset-0 animate-ping">
-                      <LayoutGrid size={18} className="text-purple-400 opacity-30" />
-                    </div>
-                  )}
-                  {/* Icon glow effect */}
-                  <div className={`absolute -inset-1 rounded-full transition-opacity duration-300 ${
-                    viewMode === "grid" ? "bg-purple-400/20 blur-sm opacity-100" : "opacity-0"
-                  }`}></div>
+            {/* Glowing border effect */}
+            <div className="absolute inset-0 rounded-xl border border-indigo-400/10 shadow-[0_0_25px_rgba(99,102,241,0.1)]"></div>
+            
+            {/* Header */}
+            <div className="relative mb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative p-2.5 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg shadow-lg">
+                    <Brain className="h-5 w-5 text-white" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/30 to-violet-400/30 rounded-lg animate-pulse"></div>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-300 via-violet-300 to-blue-300 bg-clip-text text-transparent">
+                      Your Policy Question
+                    </h3>
+                    <p className="text-slate-400 text-sm">The question that initiated this analysis</p>
+                  </div>
                 </div>
                 
-                <span className={`relative transition-all duration-300 text-base font-bold ${
-                  viewMode === "grid" ? "text-white font-bold tracking-wider" : "tracking-normal"
-                }`}>
-                  Grid View
-                </span>
-                
-                {/* Enhanced active indicator */}
-                {viewMode === "grid" && (
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse shadow-lg shadow-purple-400/50"></div>
-                    <div className="w-1 h-1 bg-purple-300 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                {/* View Mode Toggle - Integrated */}
+                <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-2 rounded-xl border border-slate-600/50 shadow-xl overflow-hidden">
+                  {/* Enhanced background matrix effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/8 via-purple-500/15 to-blue-500/8 animate-pulse"></div>
+                  
+                  {/* Expanded animated toggle indicator */}
+                  <div className={`absolute top-2 h-8 w-24 rounded-lg shadow-xl transition-all duration-500 ease-out transform ${
+                    viewMode === "tabs" ? "translate-x-2" : "translate-x-28"
+                  }`}>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-pink-400 rounded-lg opacity-60 animate-pulse"></div>
                   </div>
-                )}
-              </button>
+                  
+                  <div className="relative flex gap-1 z-10">
+                    <button
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-500 font-semibold relative overflow-hidden text-sm ${
+                        viewMode === "tabs" 
+                          ? "text-white transform scale-105" 
+                          : "text-slate-400 hover:text-slate-200"
+                      }`}
+                      onClick={() => setViewMode("tabs")}
+                    >
+                      <Layers size={14} className={viewMode === "tabs" ? "text-cyan-200" : "transition-colors duration-300"} />
+                      <span>Tabs</span>
+                    </button>
+
+                    <button
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-500 font-semibold relative overflow-hidden text-sm ${
+                        viewMode === "grid" 
+                          ? "text-white transform scale-105" 
+                          : "text-slate-400 hover:text-slate-200"
+                      }`}
+                      onClick={() => setViewMode("grid")}
+                    >
+                      <LayoutGrid size={14} className={viewMode === "grid" ? "text-purple-200" : "transition-colors duration-300"} />
+                      <span>Grid</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Decorative line */}
+              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-400/30 to-transparent animate-pulse mt-3"></div>
             </div>
             
-            {/* Corner accent elements */}
-            <div className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 border-blue-400/50 rounded-tl"></div>
-            <div className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 border-purple-400/50 rounded-tr"></div>
-            <div className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 border-cyan-400/50 rounded-bl"></div>
-            <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-pink-400/50 rounded-br"></div>
+            {/* Question Content */}
+            <div className="relative bg-gradient-to-r from-slate-900/60 to-slate-800/60 border border-slate-700/50 rounded-lg p-4 backdrop-blur-sm">
+              {/* Quote decoration */}
+              <div className="absolute top-2 left-2 text-4xl text-indigo-400/30 font-serif leading-none">"</div>
+              <div className="absolute bottom-2 right-2 text-4xl text-indigo-400/30 font-serif leading-none rotate-180">"</div>
+              
+              {/* Question text */}
+              <div className="relative z-10 pl-6 pr-6">
+                <p className="text-slate-200 text-base leading-relaxed font-medium">
+                  {initialPrompt}
+                </p>
+              </div>
+            </div>
+            
+            {/* Timestamp and metadata */}
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700/50">
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+                <span>Question analyzed</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <span>Just now</span>
+                <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
+                <span>AI Analysis</span>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Main Charts Section */}
         <div className="w-full">
@@ -1140,6 +1109,8 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
           summary={summary}
           isLoading={loading}
         />
+
+
       </div>
     </div>
   );
