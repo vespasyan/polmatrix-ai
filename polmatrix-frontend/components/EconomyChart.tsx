@@ -20,12 +20,14 @@ import { NameType, ValueType } from "recharts/types/component/DefaultTooltipCont
 import { Share2, Download, BarChart2, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Check, Info, BarChart3, ChevronDown, ChevronUp, Zap, Activity, TrendingUp, Eye, EyeOff, Maximize2, Settings, Play, Pause } from 'lucide-react'
 import { metricsConfig } from "@/lib/metricsConfig"
 
+
 type ChartType = "bar" | "line" | "area"
 
 type Props = {
   data: any[]
   selectedMetrics: string[]
   onToggleMetric: (metric: string) => void
+  simulationData?: any[]
 }
 
 const generateColor = (index: number) => {
@@ -91,10 +93,36 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
 export default function EconomyChart({
   data,
   selectedMetrics,
-  onToggleMetric
+  onToggleMetric,
+  simulationData = []
 }: Props) {
   const [chartType, setChartType] = useState<ChartType>("line")
   const [isExporting, setIsExporting] = useState(false)
+  
+  // Calculate the maximum year from both data and simulationData to set appropriate chart bounds
+  const getMaxYear = useCallback(() => {
+    let maxYear = new Date().getFullYear() + 1; // Default to next year
+    
+    // Check data for years
+    if (data && data.length > 0) {
+      const dataYears = data.map(item => item.year || 0).filter(year => year > 0);
+      if (dataYears.length > 0) {
+        maxYear = Math.max(maxYear, ...dataYears);
+      }
+    }
+    
+    // Check simulationData for years
+    if (simulationData && simulationData.length > 0) {
+      const simYears = simulationData.map(item => item.year || 0).filter(year => year > 0);
+      if (simYears.length > 0) {
+        maxYear = Math.max(maxYear, ...simYears);
+      }
+    }
+    
+    return maxYear;
+  }, [data, simulationData]);
+
+  const maxDisplayYear = getMaxYear();
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(false)
   const [isAnimating, setIsAnimating] = useState(true)
   const [showAdvancedControls, setShowAdvancedControls] = useState(false)
@@ -225,6 +253,7 @@ export default function EconomyChart({
               fontWeight="600"
               tickLine={{ stroke: "#00D4FF", strokeWidth: 1 }}
               axisLine={{ stroke: "#00D4FF", strokeWidth: 1 }}
+              tickFormatter={val => (val > maxDisplayYear ? "" : val)}
             />
             <YAxis 
               stroke="#00D4FF"
@@ -279,6 +308,7 @@ export default function EconomyChart({
               fontWeight="600"
               tickLine={{ stroke: "#00D4FF", strokeWidth: 1 }}
               axisLine={{ stroke: "#00D4FF", strokeWidth: 1 }}
+              tickFormatter={val => (val > maxDisplayYear ? "" : val)}
             />
             <YAxis 
               stroke="#00D4FF"
@@ -346,6 +376,7 @@ export default function EconomyChart({
               fontWeight="600"
               tickLine={{ stroke: "#00D4FF", strokeWidth: 1 }}
               axisLine={{ stroke: "#00D4FF", strokeWidth: 1 }}
+              tickFormatter={val => (val > maxDisplayYear ? "" : val)}
             />
             <YAxis 
               stroke="#00D4FF"

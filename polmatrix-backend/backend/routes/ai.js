@@ -3,17 +3,32 @@ const router = express.Router()
 const axios = require("axios")
 const db = require("../db")
 const { parsePolicyQuestion } = require("../services/parser")
-const { generateSimulatorData } = require("../services/simulator")
+const { runSimulation } = require("../services/simulator");
 
-// New simulation endpoint
-router.post("/simulate", (req, res, next) => {
- console.log("Simulation request received:", req.body.text);
+// Main simulation endpoint
+router.post("/simulate", async (req, res, next) => {
   try {
+    console.log("🎯 /simulate endpoint hit with:", req.body);
     const parsed = parsePolicyQuestion(req.body.text);
-    console.log("Parsed parameters:", parsed);
-    const data = generateSimulatorData(parsed);
-    console.log("Simulated rows:", data.length);
-    return res.json({ data });
+    console.log("Parsed:", parsed);
+
+    const result = await runSimulation({
+      region: "US",
+      metrics: parsed.metrics.map(m => m.metricKey),
+      startYear: parsed.time.startYear,
+      endYear: parsed.time.endYear,
+      levers: parsed.policies,
+    });
+
+    // Transform data for frontend consumption
+    const transformedData = result.map(row => ({
+      ...row,
+      label: row.year.toString(), // Add label for charts
+      country: row.region || "US" // Add country field for consistency
+    }));
+
+    console.log("🚀 Simulation completed, returning data");
+    res.json(transformedData);
   } catch (err) {
     console.error("Simulation error:", err);
     next(err);
@@ -21,22 +36,33 @@ router.post("/simulate", (req, res, next) => {
 });
 
 // GET version of simulate endpoint for easy testing
-router.get("/simulate", (req, res, next) => {
+router.get("/simulate", async (req, res, next) => {
   console.log("GET Simulation request received");
   try {
     // Use a default test question if none provided
-    const testQuestion = req.query.text || "What is the impact of education spending on economic growth?";
+    const testQuestion = req.query.text || "What is the impact of education spending on economic growth through 2030?";
     console.log("Using test question:", testQuestion);
     
     const parsed = parsePolicyQuestion(testQuestion);
     console.log("Parsed parameters:", parsed);
-    const data = generateSimulatorData(parsed);
-    console.log("Simulated rows:", data.length);
-    return res.json({ 
-      data,
-      message: "GET simulation test - use POST for production",
-      testQuestion 
+    
+    const result = await runSimulation({
+      region: "US",
+      metrics: parsed.metrics.map(m => m.metricKey),
+      startYear: parsed.time.startYear,
+      endYear: parsed.time.endYear,
+      levers: parsed.policies,
     });
+
+    // Transform data for frontend consumption
+    const transformedData = result.map(row => ({
+      ...row,
+      label: row.year.toString(),
+      country: row.region || "US"
+    }));
+    
+    console.log("Simulated rows:", transformedData.length);
+    return res.json(transformedData);
   } catch (err) {
     console.error("Simulation error:", err);
     next(err);

@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import ChartTabs from "@/components/ChartTabs";
+import ChartGrid from "@/components/ChartGrid";
 import GlobalFilter from "@/components/GlobalFilter";
 import SimulationResults from "@/components/SimulationResults";
-import GridCharts from "@/components/GridCharts";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion"
 import { LayoutGrid, Layers, Plus, GitCompare, RefreshCw, Settings, AlertCircle, Brain, TrendingUp, Users, Heart, Leaf } from "lucide-react";
@@ -12,7 +12,8 @@ import {
   fetchEconomyData, 
   fetchEducationData, 
   fetchHealthData, 
-  fetchEnvironmentData 
+  fetchEnvironmentData,
+  fetchSimulationData
 } from "@/lib/api";
 
 interface DashboardViewProps {
@@ -148,6 +149,10 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
     conservation_filter: undefined as number | undefined,
   });
 
+  //Sample Questions...
+  const [simulatedData, setSimulatedData] = useState<any[]>([]);
+
+
   // Save view mode preference
   useEffect(() => {
     localStorage.setItem("viewMode", viewMode)
@@ -220,6 +225,10 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
       }      const aiInsights = await insightsResponse.json();
       console.log("✅ Insights generated:", aiInsights);
       setSmartInsights(aiInsights);
+      
+      console.log("📡 Step 4: Fetching simulation data...");
+      const simulationOutput = await fetchSimulationData(question);
+      setSimulatedData(simulationOutput);
       
       // Set summary for compatibility with existing SimulationResults
       setSummary(aiInsights.insights);      // Step 4: Update chart data states with analysis results
@@ -1080,9 +1089,10 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
                   correlationTab={correlationTab}
                   setCorrelationTab={setCorrelationTab}
                   isLoading={dataLoading}
+                  simulatedData={simulatedData}
                 />
               ) : (
-                <GridCharts
+                <ChartGrid
                   economyData={economyData}
                   educationData={educationData}
                   environmentData={environmentData}
@@ -1098,6 +1108,7 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
                   correlationTab={correlationTab}
                   setCorrelationTab={setCorrelationTab}
                   isLoading={dataLoading}
+                  simulatedData={simulatedData}
                 />
               )}
             </motion.div>
@@ -1108,6 +1119,7 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
         <SimulationResults 
           summary={summary}
           isLoading={loading}
+          data={{ smartData }}
         />
 
 

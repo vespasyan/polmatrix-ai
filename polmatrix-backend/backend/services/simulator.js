@@ -1,15 +1,16 @@
-// backend/src/services/simulator.js
+// backend/services/simulator.js
 const axios = require("axios");
 const db = require("../db");
-const eduModel = require('./domainModels/educationModel')
-const envModel = require('./domainModels/environmentModel')
-const ecoModel = require('./domainModels/economyModel')
-const hlthModel = require('./domainModels/healthModel')
+const eduModel = require('./domainModels/educationModel');
+const envModel = require('./domainModels/environmentModel');
+const ecoModel = require('./domainModels/economyModel');
+const hlthModel = require('./domainModels/healthModel');
+const domainModels = require('./domainModels/policyEffects');
 
 const FORECAST_API = "http://localhost:8000/forecast";
 
 async function runSimulation({ region = "US", metrics, startYear, endYear, levers = [] }) {
-  // 1️⃣ Pull real data from facts table
+  // 1️⃣ Pull real data from DB for years before the start
   const result = await db.query(
     `SELECT year, metric_code, value
      FROM facts
@@ -21,11 +22,12 @@ async function runSimulation({ region = "US", metrics, startYear, endYear, lever
   const history = result.rows.map(row => ({
     year: row.year,
     region,
+    source: "real",
     [row.metric_code]: Number(row.value)
   }));
 
-  // 2️⃣ Estimate future baseline via Python service
-  const context = getContextFromHistory(history, metrics); // pulls latest feature values
+  // 2️⃣ Generate baseline forecast from Python service
+  const context = getContextFromHistory(history, metrics);
 
   const future = [];
 
@@ -42,12 +44,13 @@ async function runSimulation({ region = "US", metrics, startYear, endYear, lever
       const forecasted = response.data.map(row => ({
         year: row.year,
         region: row.region,
+        source: "simulated",
         [metric]: applyPolicyEffect(row[metric], metric, levers, row.year - startYear)
       }));
 
-      // Merge forecasted metric into `future[]` by year
+      // Merge forecasted metric into unified future[]
       forecasted.forEach(pt => {
-        const yearRow = future.find(r => r.year === pt.year) || { year: pt.year, region };
+        const yearRow = future.find(r => r.year === pt.year) || { year: pt.year, region: pt.region, source: "simulated" };
         Object.assign(yearRow, pt);
         if (!future.includes(yearRow)) future.push(yearRow);
       });
@@ -56,13 +59,13 @@ async function runSimulation({ region = "US", metrics, startYear, endYear, lever
     }
   }
 
-  // 3️⃣ Merge history + future
+  // 3️⃣ Merge history + future data
   const merged = [...history, ...future].sort((a, b) => a.year - b.year);
   return merged;
 }
 
 function applyPolicyEffect(value, metric, levers, yearOffset) {
-  const decay = 1 / (1 + 0.2 * yearOffset); // simple decay curve
+  const decay = 1 / (1 + 0.2 * yearOffset);
   let delta = 0;
 
   for (const lever of levers) {
@@ -76,11 +79,15 @@ function applyPolicyEffect(value, metric, levers, yearOffset) {
 }
 
 function getContextFromHistory(history, metrics) {
-  const latest = history.filter(r => r.year === Math.max(...history.map(h => h.year)))[0];
-  return metrics.reduce((acc, m) => {
-    if (latest[m] !== undefined) acc[m] = latest[m];
+  const latestYear = Math.max(...history.map(h => h.year));
+  const latest = history.find(r => r.year === latestYear);
+
+  return metrics.reduce((acc, metricKey) => {
+    const key = typeof metricKey === "string" ? metricKey : metricKey.metricKey;
+    if (latest?.[key] !== undefined) acc[key] = latest[key];
     return acc;
   }, {});
 }
 
 module.exports = { runSimulation };
+// backend/src/services/simulator.js

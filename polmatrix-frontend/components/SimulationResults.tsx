@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
-export default function SimulationResults({ summary, isLoading }: { summary: string | null; isLoading: boolean }) {
+export default function SimulationResults({ summary, isLoading, data}: { summary: string | null; isLoading: boolean; data: any | null }) {
   const mockImpactScore = 85; // 👉 Later you can wire real values!
   const mockConfidence = 92; // 👉 Later you can wire real values!
   
@@ -814,5 +814,6 @@ export default function SimulationResults({ summary, isLoading }: { summary: str
         </div>
       </motion.div>
     </motion.aside>
+    
   );
 }

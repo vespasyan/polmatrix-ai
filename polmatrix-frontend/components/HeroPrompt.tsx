@@ -5,7 +5,7 @@ import { ArrowRight, Paperclip, Send, Menu, X, Sparkles, AlertTriangle } from "l
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useSimulation } from "../app/api/hooks/useSimulation";
-import TestGrid from "./TestGrid"; // Assuming you have a TestGrid component
+
 
 
 type SamplePrompt = {
@@ -43,7 +43,8 @@ export default function HeroPrompt({ onStartSimulation }: HeroPromptProps) {
       'might', 'can', 'must', 'shall', 'policy', 'government', 'economic', 'social',
       'infrastructure', 'spending', 'tax', 'incentive', 'gdp', 'growth', 'tech',
       'sector', 'job', 'creation', 'urban', 'rural', 'regions', 'years', 'increase',
-      'nationwide', 'technology', 'startups', 'affect', 'combined'
+      'nationwide', 'technology', 'startups', 'affect', 'combined',
+      'CO₂', 'carbon', 'emissions', 'renewable', 'energy', 'climate',
     ];
     
     // Check if text contains only valid English characters (including various dashes and punctuation)
@@ -672,18 +673,18 @@ export default function HeroPrompt({ onStartSimulation }: HeroPromptProps) {
           transition={{ duration: 0.3 }}
         >
           {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           
           {/* Icon container */}
-          <div className="relative w-10 h-10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-500">
-            <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-500 rounded-md flex items-center justify-center text-sm animate-pulse">
+          <div className="relative w-10 h-10 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-500">
+            <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-cyan-500 rounded-md flex items-center justify-center text-sm animate-pulse">
               🎯
             </div>
             {/* Target rings */}
             <div className="absolute inset-0 rounded-lg border border-purple-400/20 animate-pulse"></div>
           </div>
           
-          <h4 className="font-bold text-base bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-2">
+          <h4 className="font-bold text-base bg-gradient-to-r from-purple-400 to-cyan-500 bg-clip-text text-transparent mb-2">
             Precision Targeting
           </h4>
           <p className="text-slate-300 text-xs leading-relaxed">

@@ -10,20 +10,26 @@ router.get("/", async (req, res) => {
   try {
     let query = `
       SELECT 
-        id as education_id,
-        geography_id,
-        time_id,
-        CAST(literacy_rate AS DECIMAL) as literacy_rate,
-        CAST(school_enrollment_rate AS DECIMAL) as school_enrollment_rate,
-        CAST(education_expenditure AS DECIMAL) as education_expenditure_per_capita,
-        CAST(primary_completion_rate AS DECIMAL) as primary_completion_rate,
-        CAST(teacher_student_ratio AS DECIMAL) as teacher_student_ratio,
-        CAST(enrollment_primary AS DECIMAL) as enrollment_primary,
-        CAST(enrollment_secondary AS DECIMAL) as enrollment_secondary,
-        CAST(enrollment_tertiary AS DECIMAL) as enrollment_tertiary,
-        source,
-        CAST(literacy_rate_filter AS INTEGER) as education_filter
-      FROM education WHERE 1=1
+        e.id as education_id,
+        e.geography_id,
+        e.time_id,
+        CAST(e.literacy_rate AS DECIMAL) as literacy_rate,
+        CAST(e.school_enrollment_rate AS DECIMAL) as school_enrollment_rate,
+        CAST(e.education_expenditure AS DECIMAL) as education_expenditure_per_capita,
+        CAST(e.primary_completion_rate AS DECIMAL) as primary_completion_rate,
+        CAST(e.teacher_student_ratio AS DECIMAL) as teacher_student_ratio,
+        CAST(e.enrollment_primary AS DECIMAL) as enrollment_primary,
+        CAST(e.enrollment_secondary AS DECIMAL) as enrollment_secondary,
+        CAST(e.enrollment_tertiary AS DECIMAL) as enrollment_tertiary,
+        e.source,
+        CAST(e.literacy_rate_filter AS INTEGER) as education_filter,
+        g.country_name,
+        t.year,
+        CONCAT(g.country_name, ' ', t.year) as label
+      FROM education e
+      JOIN geography g ON e.geography_id = g.geography_id  
+      JOIN time t ON e.time_id = t.time_id
+      WHERE 1=1
     `
     const values = []
 
@@ -32,7 +38,7 @@ router.get("/", async (req, res) => {
       const geoIds = Array.isArray(geography_id) ? geography_id : [geography_id];
       const placeholders = geoIds.map((_, i) => `$${values.length + i + 1}`).join(',');
       values.push(...geoIds);
-      query += ` AND geography_id IN (${placeholders})`;
+      query += ` AND e.geography_id IN (${placeholders})`;
     }
 
     // Handle time_id array
@@ -40,7 +46,7 @@ router.get("/", async (req, res) => {
       const timeIds = Array.isArray(time_id) ? time_id : [time_id];
       const placeholders = timeIds.map((_, i) => `$${values.length + i + 1}`).join(',');
       values.push(...timeIds);
-      query += ` AND time_id IN (${placeholders})`;
+      query += ` AND e.time_id IN (${placeholders})`;
     }
 
     const result = await db.query(query, values)

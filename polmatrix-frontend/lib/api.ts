@@ -1,4 +1,5 @@
 import axios from 'axios'
+import React from 'react';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
@@ -16,6 +17,19 @@ export const endpoints = {
   geography: '/api/geography',
   time: '/api/time'
 }
+
+//Sample Questions...
+export async function fetchSimulationData(prompt: string): Promise<any[]> {
+  const res = await fetch("/api/ai/simulate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: prompt }),
+  });
+
+  const json = await res.json();
+  return json.data || [];
+}
+
 
 // Data fetching functions
 export const fetchEconomyData = async (filters?: any) => {

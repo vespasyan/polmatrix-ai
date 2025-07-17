@@ -9,6 +9,7 @@ import CorrelationChart from "./CorrelationChart"
 import CorrelationMatrix from "./CorrelationMatrix"
 import { motion, AnimatePresence } from "framer-motion"
 import { BarChart3, GraduationCap, Leaf, Heart, TrendingUp, Grid3X3 } from "lucide-react"
+import { pivotSimulationData } from "@/lib/chartTransforms";
 
 type Props = {
   economyData: any[]
@@ -26,6 +27,7 @@ type Props = {
   correlationTab?: "impact" | "matrix"
   setCorrelationTab?: (tab: "impact" | "matrix") => void
   isLoading?: boolean
+  simulatedData: any[]
 }
 
 const tabConfig = [
@@ -86,10 +88,37 @@ export default function ChartTabs({
   onToggleHealth,
   correlationTab = "impact",
   setCorrelationTab = () => {},
-  isLoading = false
+  isLoading = false,
+  simulatedData
 }: Props) {
   const [activeTab, setActiveTab] = useState("economy")
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)
+
+  const pivoted = pivotSimulationData(simulatedData || []);
+
+  const economy = pivoted.map(row => ({
+    year: row.year,
+    gdp: row.gdp,
+    unemployment_rate: row.unemployment_rate,
+  }));
+
+  const education = pivoted.map(row => ({
+    year: row.year,
+    literacy_rate: row.literacy_rate,
+    school_enrollment_rate: row.school_enrollment_rate,
+  }));
+
+  const environment = pivoted.map(row => ({
+    year: row.year,
+    co2_emissions: row.co2_emissions,
+    renewable_energy_percentage: row.renewable_energy_percentage,
+  }));
+
+  const health = pivoted.map(row => ({
+    year: row.year,
+    life_expectancy: row.life_expectancy,
+    healthcare_expenditure_per_capita: row.healthcare_expenditure_per_capita,
+  }));
 
   const renderChart = () => {
     if (isLoading) {
@@ -113,15 +142,15 @@ export default function ChartTabs({
 
     switch (activeTab) {
       case "economy":
-        return <EconomyChart data={economyData} selectedMetrics={economyMetrics} onToggleMetric={onToggleEconomy} />
+        return <EconomyChart data={economyData} selectedMetrics={economyMetrics} onToggleMetric={onToggleEconomy} simulationData={economy} />
       case "education":
-        return <EducationChart data={educationData} selectedMetrics={educationMetrics} onToggleMetric={onToggleEducation} />
+        return <EducationChart data={educationData} selectedMetrics={educationMetrics} onToggleMetric={onToggleEducation} simulationData={education} />
       case "environment":
-        return <EnvironmentChart data={environmentData} selectedMetrics={environmentMetrics} onToggleMetric={onToggleEnvironment} />
+        return <EnvironmentChart data={environmentData} selectedMetrics={environmentMetrics} onToggleMetric={onToggleEnvironment} simulationData={environment} />
       case "health":
-        return <HealthChart data={healthData} selectedMetrics={healthMetrics} onToggleMetric={onToggleHealth} />
+        return <HealthChart data={healthData} selectedMetrics={healthMetrics} onToggleMetric={onToggleHealth} simulationData={health} />
       default:
-        return <EconomyChart data={economyData} selectedMetrics={economyMetrics} onToggleMetric={onToggleEconomy} />
+        return <EconomyChart data={economyData} selectedMetrics={economyMetrics} onToggleMetric={onToggleEconomy} simulationData={economy} />
     }
   }
 

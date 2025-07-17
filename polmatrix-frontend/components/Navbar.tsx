@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
                 />
               </div>
               
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-grey-400 via-purple-400 to-grey-400 
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-grey-500 via-purple-400 to-grey-500 
                              bg-clip-text text-transparent tracking-wider">
                 POLMATRIX
               </h1>
@@ -114,14 +114,14 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* User Profile */}
-            <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 
+            <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-gradient-to-br from-purple-500/10 to-cyan-500/10 
                             border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300
                             hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] cursor-pointer group">
               <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-cyan-400 flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 blur-sm opacity-50 group-hover:opacity-75 transition-opacity" />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-400 to-cyan-400 blur-sm opacity-50 group-hover:opacity-75 transition-opacity" />
               </div>
               <div className="hidden sm:flex flex-col">
                 <span className="text-sm font-medium text-white">Neural User</span>

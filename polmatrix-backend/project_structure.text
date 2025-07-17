@@ -8,7 +8,22 @@
   - routes
     - ai.js
     - economy.js
+    - education.js
+    - environment.js
+    - health.js
     - policy.js
+  - services
+    - domainModels
+      - economyModel.js
+      - educationModel.js
+      - environmentModel.js
+      - healthModel.js
+      - policyEffects.js
+    - parser.js
+    - simulator.js
+  - test
+    - sample_sim.js
   - us-east-2-bundle.pem
+- project_structure.text
 - README.md
 - schema.sql

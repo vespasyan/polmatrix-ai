@@ -37,7 +37,7 @@ router.get("/", async (req, res) => {
       const geoIds = Array.isArray(countries) ? countries : [countries];
       const placeholders = geoIds.map((_, i) => `$${values.length + i + 1}`).join(',');
       values.push(...geoIds);
-      query += ` AND geography_id IN (${placeholders})`;
+      query += ` AND e.geography_id IN (${placeholders})`;
     }
 
     // Handle timeIds array (time_id)
@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
       const tIds = Array.isArray(timeIds) ? timeIds : [timeIds];
       const placeholders = tIds.map((_, i) => `$${values.length + i + 1}`).join(',');
       values.push(...tIds);
-      query += ` AND time_id IN (${placeholders})`;
+      query += ` AND e.time_id IN (${placeholders})`;
     }
 
     console.log("🔍 Final query:", query);

@@ -10,18 +10,24 @@ router.get("/", async (req, res) => {
   try {
     let query = `
       SELECT 
-        id as health_id,
-        geography_id,
-        time_id,
-        CAST(life_expectancy AS DECIMAL) as life_expectancy,
-        CAST(maternal_mortality AS DECIMAL) as maternal_mortality_rate,
-        CAST(healthcare_expenditure AS DECIMAL) as healthcare_expenditure_per_capita,
-        CAST(physicians_per_1k AS DECIMAL) as physician_density,
-        CAST(infant_mortality AS DECIMAL) as infant_mortality,
-        CAST(disease_burden AS DECIMAL) as disease_burden,
-        source,
-        CAST(life_expectancy_filter AS INTEGER) as health_filter
-      FROM health WHERE 1=1
+        h.id as health_id,
+        h.geography_id,
+        h.time_id,
+        CAST(h.life_expectancy AS DECIMAL) as life_expectancy,
+        CAST(h.maternal_mortality AS DECIMAL) as maternal_mortality_rate,
+        CAST(h.healthcare_expenditure AS DECIMAL) as healthcare_expenditure_per_capita,
+        CAST(h.physicians_per_1k AS DECIMAL) as physician_density,
+        CAST(h.infant_mortality AS DECIMAL) as infant_mortality,
+        CAST(h.disease_burden AS DECIMAL) as disease_burden,
+        h.source,
+        CAST(h.life_expectancy_filter AS INTEGER) as health_filter,
+        g.country_name,
+        t.year,
+        CONCAT(g.country_name, ' ', t.year) as label
+      FROM health h
+      JOIN geography g ON h.geography_id = g.geography_id  
+      JOIN time t ON h.time_id = t.time_id
+      WHERE 1=1
     `
     const values = []
 
@@ -30,7 +36,7 @@ router.get("/", async (req, res) => {
       const geoIds = Array.isArray(countries) ? countries : [countries];
       const placeholders = geoIds.map((_, i) => `$${values.length + i + 1}`).join(',');
       values.push(...geoIds);
-      query += ` AND geography_id IN (${placeholders})`;
+      query += ` AND h.geography_id IN (${placeholders})`;
     }
 
     // Handle timeIds array
@@ -38,7 +44,7 @@ router.get("/", async (req, res) => {
       const tIds = Array.isArray(timeIds) ? timeIds : [timeIds];
       const placeholders = tIds.map((_, i) => `$${values.length + i + 1}`).join(',');
       values.push(...tIds);
-      query += ` AND time_id IN (${placeholders})`;
+      query += ` AND h.time_id IN (${placeholders})`;
     }
 
     const result = await db.query(query, values)

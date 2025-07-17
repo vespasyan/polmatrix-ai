@@ -20,12 +20,14 @@ import { NameType, ValueType } from "recharts/types/component/DefaultTooltipCont
 import { Share2, Download, BarChart2, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Check, Info, Heart, ChevronDown, ChevronUp, HeartPulse, Activity, TrendingUp, Eye, EyeOff, Maximize2, Settings, Play, Pause, Stethoscope, Shield, Zap } from 'lucide-react'
 import { metricsConfig } from "@/lib/metricsConfig"
 
+
 type ChartType = "bar" | "line" | "area"
 
 type Props = {
   data: any[]
   selectedMetrics: string[]
   onToggleMetric: (metric: string) => void
+  simulationData?: any[]
 }
 
 const generateColor = (index: number) => {
@@ -89,9 +91,39 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   return null
 }
 
-export default function HealthChart({ data, selectedMetrics, onToggleMetric }: Props) {
+export default function HealthChart({ 
+  data, 
+  selectedMetrics, 
+  onToggleMetric, 
+  simulationData = [] 
+}: Props) {
   const [chartType, setChartType] = useState<ChartType>("line")
   const [isExporting, setIsExporting] = useState(false)
+  
+  // Calculate the maximum year from both data and simulationData to set appropriate chart bounds
+  const getMaxYear = useCallback(() => {
+    let maxYear = new Date().getFullYear() + 1; // Default to next year
+    
+    // Check data for years (health data now includes year field from JOIN)
+    if (data && data.length > 0) {
+      const dataYears = data.map(item => item.year || 0).filter(year => year > 0);
+      if (dataYears.length > 0) {
+        maxYear = Math.max(maxYear, ...dataYears);
+      }
+    }
+    
+    // Check simulationData for years
+    if (simulationData && simulationData.length > 0) {
+      const simYears = simulationData.map(item => item.year || 0).filter(year => year > 0);
+      if (simYears.length > 0) {
+        maxYear = Math.max(maxYear, ...simYears);
+      }
+    }
+    
+    return maxYear;
+  }, [data, simulationData]);
+
+  const maxDisplayYear = getMaxYear();
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(false)
   const [isAnimating, setIsAnimating] = useState(true)
   const [showAdvancedControls, setShowAdvancedControls] = useState(false)
@@ -216,12 +248,13 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
               opacity={0.5}
             />
             <XAxis 
-              dataKey="label" 
+              dataKey="year" 
               stroke="#EF4444"
               fontSize={12}
               fontWeight="600"
               tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
               axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              tickFormatter={val => (val > maxDisplayYear ? "" : val)}
             />
             <YAxis 
               stroke="#EF4444"
@@ -270,12 +303,13 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
               opacity={0.5}
             />
             <XAxis 
-              dataKey="label" 
+              dataKey="year" 
               stroke="#EF4444"
               fontSize={12}
               fontWeight="600"
               tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
               axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              tickFormatter={val => (val > maxDisplayYear ? "" : val)}
             />
             <YAxis 
               stroke="#EF4444"
@@ -337,12 +371,13 @@ export default function HealthChart({ data, selectedMetrics, onToggleMetric }: P
               opacity={0.5}
             />
             <XAxis 
-              dataKey="label" 
+              dataKey="year" 
               stroke="#EF4444"
               fontSize={12}
               fontWeight="600"
               tickLine={{ stroke: "#EF4444", strokeWidth: 1 }}
               axisLine={{ stroke: "#EF4444", strokeWidth: 1 }}
+              tickFormatter={val => (val > maxDisplayYear ? "" : val)}
             />
             <YAxis 
               stroke="#EF4444"

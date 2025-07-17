@@ -12,7 +12,7 @@ export async function simulatePolicy(question: string) {
       throw new Error(`HTTP error! status: ${resp.status}`);
     }
 
-    const simData = await resp.json();  // { data: [...] }
+    const simData = await resp.json();  // Direct array now, not { data: [...] }
     console.log("SIMULATOR DATA:", simData);
     return simData;
   } catch (error) {
