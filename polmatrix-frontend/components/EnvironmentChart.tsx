@@ -222,6 +222,11 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
               fontWeight="600"
               tickLine={{ stroke: "#10B981", strokeWidth: 1 }}
               axisLine={{ stroke: "#10B981", strokeWidth: 1 }}
+              tickFormatter={value => {
+                // Extract year from label like "United States 2023" -> "2023"
+                const yearMatch = value?.toString().match(/\d{4}$/)
+                return yearMatch ? yearMatch[0] : value
+              }}
             />
             <YAxis 
               stroke="#10B981"
@@ -276,6 +281,11 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
               fontWeight="600"
               tickLine={{ stroke: "#10B981", strokeWidth: 1 }}
               axisLine={{ stroke: "#10B981", strokeWidth: 1 }}
+              tickFormatter={value => {
+                // Extract year from label like "United States 2023" -> "2023"
+                const yearMatch = value?.toString().match(/\d{4}$/)
+                return yearMatch ? yearMatch[0] : value
+              }}
             />
             <YAxis 
               stroke="#10B981"
@@ -343,6 +353,11 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
               fontWeight="600"
               tickLine={{ stroke: "#10B981", strokeWidth: 1 }}
               axisLine={{ stroke: "#10B981", strokeWidth: 1 }}
+              tickFormatter={value => {
+                // Extract year from label like "United States 2023" -> "2023"
+                const yearMatch = value?.toString().match(/\d{4}$/)
+                return yearMatch ? yearMatch[0] : value
+              }}
             />
             <YAxis 
               stroke="#10B981"
