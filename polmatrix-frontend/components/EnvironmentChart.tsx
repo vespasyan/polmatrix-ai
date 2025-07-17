@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useCallback } from "react"
+import React, { useState, useRef, useCallback, useMemo } from "react"
 import {
   LineChart,
   Line,
@@ -26,6 +26,7 @@ type Props = {
   data: any[]
   selectedMetrics: string[]
   onToggleMetric: (metric: string) => void
+  simulationData?: any[]
 }
 
 const generateColor = (index: number) => {
@@ -89,13 +90,78 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   return null
 }
 
-export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric }: Props) {
+export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric, simulationData = [] }: Props) {
   const [chartType, setChartType] = useState<ChartType>("line")
   const [isExporting, setIsExporting] = useState(false)
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(false)
   const [isAnimating, setIsAnimating] = useState(true)
   const [showAdvancedControls, setShowAdvancedControls] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
+
+  // Aggregate data by year to prevent duplicate years on X-axis
+  const aggregatedData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+
+    // Group data by year
+    const yearGroups = data.reduce((acc: Record<number, { year: number; items: any[]; count: number }>, item: any) => {
+      const year = item.year;
+      if (!year) return acc;
+      
+      if (!acc[year]) {
+        acc[year] = {
+          year,
+          items: [],
+          count: 0
+        };
+      }
+      acc[year].items.push(item);
+      acc[year].count++;
+      return acc;
+    }, {});
+
+    // Aggregate metrics for each year (taking average across countries)
+    return Object.values(yearGroups).map(({ year, items }: { year: number; items: any[] }) => {
+      const aggregated: any = { year };
+      
+      // Calculate averages for each metric
+      Object.keys(metricMap).forEach(metric => {
+        const values = items
+          .map((item: any) => parseFloat(item[metric]))
+          .filter((val: number) => !isNaN(val) && val !== null && val !== undefined);
+        
+        if (values.length > 0) {
+          aggregated[metric] = values.reduce((sum: number, val: number) => sum + val, 0) / values.length;
+        }
+      });
+      
+      return aggregated;
+    }).sort((a: any, b: any) => a.year - b.year);
+  }, [data]);
+
+  // Calculate the maximum year from both data and simulationData to set appropriate chart bounds
+  const getMaxYear = useCallback(() => {
+    let maxYear = new Date().getFullYear() + 1; // Default to next year
+    
+    // Check aggregated data for years
+    if (aggregatedData && aggregatedData.length > 0) {
+      const dataYears = aggregatedData.map((item: any) => item.year || 0).filter((year: number) => year > 0);
+      if (dataYears.length > 0) {
+        maxYear = Math.max(maxYear, ...dataYears);
+      }
+    }
+    
+    // Check simulationData for years
+    if (simulationData && simulationData.length > 0) {
+      const simYears = simulationData.map(item => item.year || 0).filter(year => year > 0);
+      if (simYears.length > 0) {
+        maxYear = Math.max(maxYear, ...simYears);
+      }
+    }
+    
+    return maxYear;
+  }, [aggregatedData, simulationData]);
+
+  const maxDisplayYear = getMaxYear();
 
   const handleShare = useCallback(async () => {
     if (navigator.share) {
@@ -125,10 +191,10 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
     setIsExporting(true)
     try {
       // Download CSV functionality
-      const headers = ["label", ...selectedMetrics]
+      const headers = ["year", ...selectedMetrics]
       const csvRows = [
         headers.join(","),
-        ...data.map(row => {
+        ...aggregatedData.map(row => {
           const values = headers.map(header => {
             const value = row[header]
             return typeof value === 'string' && value.includes(',') ? `"${value}"` : value
@@ -157,7 +223,7 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
     } finally {
       setIsExporting(false)
     }
-  }, [data, selectedMetrics])
+  }, [aggregatedData, selectedMetrics])
 
   const chartTypeConfig = {
     bar: { 
@@ -179,7 +245,7 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
 
   const renderChart = () => {
     const chartProps = {
-      data,
+      data: aggregatedData,
       margin: { top: 20, right: 30, left: 20, bottom: 20 }
     }
 
@@ -216,17 +282,13 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
               opacity={0.5}
             />
             <XAxis 
-              dataKey="label" 
+              dataKey="year" 
               stroke="#10B981"
               fontSize={12}
               fontWeight="600"
               tickLine={{ stroke: "#10B981", strokeWidth: 1 }}
               axisLine={{ stroke: "#10B981", strokeWidth: 1 }}
-              tickFormatter={value => {
-                // Extract year from label like "United States 2023" -> "2023"
-                const yearMatch = value?.toString().match(/\d{4}$/)
-                return yearMatch ? yearMatch[0] : value
-              }}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis 
               stroke="#10B981"
@@ -275,17 +337,13 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
               opacity={0.5}
             />
             <XAxis 
-              dataKey="label" 
+              dataKey="year" 
               stroke="#10B981"
               fontSize={12}
               fontWeight="600"
               tickLine={{ stroke: "#10B981", strokeWidth: 1 }}
               axisLine={{ stroke: "#10B981", strokeWidth: 1 }}
-              tickFormatter={value => {
-                // Extract year from label like "United States 2023" -> "2023"
-                const yearMatch = value?.toString().match(/\d{4}$/)
-                return yearMatch ? yearMatch[0] : value
-              }}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis 
               stroke="#10B981"
@@ -347,17 +405,13 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
               opacity={0.5}
             />
             <XAxis 
-              dataKey="label" 
+              dataKey="year" 
               stroke="#10B981"
               fontSize={12}
               fontWeight="600"
               tickLine={{ stroke: "#10B981", strokeWidth: 1 }}
               axisLine={{ stroke: "#10B981", strokeWidth: 1 }}
-              tickFormatter={value => {
-                // Extract year from label like "United States 2023" -> "2023"
-                const yearMatch = value?.toString().match(/\d{4}$/)
-                return yearMatch ? yearMatch[0] : value
-              }}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis 
               stroke="#10B981"
@@ -406,7 +460,7 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
     }
   }
 
-  if (!data || data.length === 0) {
+  if (!aggregatedData || aggregatedData.length === 0) {
     return (
       <div className="relative h-[400px] flex items-center justify-center bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-green-500/30 overflow-hidden">
         {/* Animated background */}
@@ -465,7 +519,7 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
           <div className="flex items-center gap-2 px-3 py-1 bg-black/40 rounded-full border border-green-500/30">
             <Leaf className="h-4 w-4 text-green-400" />
             <span className="text-sm text-gray-300 font-medium">
-              {selectedMetrics.length} active • {data.length} points
+              {selectedMetrics.length} active • {aggregatedData.length} points
             </span>
           </div>
         </div>
@@ -548,7 +602,7 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 bg-black/40 rounded-xl border border-green-500/30">
                 <div className="text-sm text-gray-400 mb-1">Data Points</div>
-                <div className="text-2xl font-bold text-green-400">{data.length}</div>
+                <div className="text-2xl font-bold text-green-400">{aggregatedData.length}</div>
               </div>
               <div className="p-4 bg-black/40 rounded-xl border border-green-500/30">
                 <div className="text-sm text-gray-400 mb-1">Active Metrics</div>
