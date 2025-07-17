@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useCallback } from "react"
+import React, { useState, useRef, useCallback, useMemo } from "react"
 import {
   LineChart,
   Line,
@@ -99,13 +99,53 @@ export default function EconomyChart({
   const [chartType, setChartType] = useState<ChartType>("line")
   const [isExporting, setIsExporting] = useState(false)
   
+  // Aggregate data by year to prevent duplicate years on X-axis
+  const aggregatedData = useMemo(() => {
+    if (!data || !Array.isArray(data) || data.length === 0) return [];
+
+    // Group data by year
+    const yearGroups = data.reduce((acc: Record<number, { year: number; items: any[]; count: number }>, item: any) => {
+      const year = item.year;
+      if (!year) return acc;
+      
+      if (!acc[year]) {
+        acc[year] = {
+          year,
+          items: [],
+          count: 0
+        };
+      }
+      acc[year].items.push(item);
+      acc[year].count++;
+      return acc;
+    }, {});
+
+    // Aggregate metrics for each year (taking average across countries)
+    return Object.values(yearGroups).map(({ year, items }: { year: number; items: any[] }) => {
+      const aggregated: any = { year };
+      
+      // Calculate averages for each metric
+      Object.keys(metricMap).forEach(metric => {
+        const values = items
+          .map((item: any) => parseFloat(item[metric]))
+          .filter((val: number) => !isNaN(val) && val !== null && val !== undefined);
+        
+        if (values.length > 0) {
+          aggregated[metric] = values.reduce((sum: number, val: number) => sum + val, 0) / values.length;
+        }
+      });
+      
+      return aggregated;
+    }).sort((a: any, b: any) => a.year - b.year);
+  }, [data]);
+  
   // Calculate the maximum year from both data and simulationData to set appropriate chart bounds
   const getMaxYear = useCallback(() => {
     let maxYear = new Date().getFullYear() + 1; // Default to next year
     
-    // Check data for years
-    if (data && data.length > 0) {
-      const dataYears = data.map(item => item.year || 0).filter(year => year > 0);
+    // Check aggregated data for years
+    if (aggregatedData && aggregatedData.length > 0) {
+      const dataYears = aggregatedData.map((item: any) => item.year || 0).filter((year: number) => year > 0);
       if (dataYears.length > 0) {
         maxYear = Math.max(maxYear, ...dataYears);
       }
@@ -120,7 +160,7 @@ export default function EconomyChart({
     }
     
     return maxYear;
-  }, [data, simulationData]);
+  }, [aggregatedData, simulationData]);
 
   const maxDisplayYear = getMaxYear();
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(false)
@@ -159,7 +199,7 @@ export default function EconomyChart({
       const headers = ["year", ...selectedMetrics]
       const csvRows = [
         headers.join(","),
-        ...data.map(row => {
+        ...aggregatedData.map(row => {
           const values = headers.map(header => {
             const value = row[header]
             return typeof value === 'string' && value.includes(',') ? `"${value}"` : value
@@ -188,7 +228,7 @@ export default function EconomyChart({
     } finally {
       setIsExporting(false)
     }
-  }, [data, selectedMetrics])
+  }, [aggregatedData, selectedMetrics])
 
   const chartTypeConfig = {
     bar: { 
@@ -210,7 +250,7 @@ export default function EconomyChart({
 
   const renderChart = () => {
     const chartProps = {
-      data,
+      data: aggregatedData,
       margin: { top: 20, right: 30, left: 20, bottom: 20 }
     }
 
@@ -425,7 +465,7 @@ export default function EconomyChart({
     }
   }
 
-  if (!data || data.length === 0) {
+  if (!aggregatedData || aggregatedData.length === 0) {
     return (
       <div className="relative h-[400px] flex items-center justify-center bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-cyan-500/30 overflow-hidden">
         {/* Animated background */}
@@ -484,7 +524,7 @@ export default function EconomyChart({
           <div className="flex items-center gap-2 px-3 py-1 bg-black/40 rounded-full border border-cyan-500/30">
             <TrendingUp className="h-4 w-4 text-green-400" />
             <span className="text-sm text-gray-300 font-medium">
-              {selectedMetrics.length} active • {data.length} points
+              {selectedMetrics.length} active • {aggregatedData.length} points
             </span>
           </div>
         </div>
@@ -567,7 +607,7 @@ export default function EconomyChart({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 bg-black/40 rounded-xl border border-cyan-500/30">
                 <div className="text-sm text-gray-400 mb-1">Data Points</div>
-                <div className="text-2xl font-bold text-cyan-400">{data.length}</div>
+                <div className="text-2xl font-bold text-cyan-400">{aggregatedData.length}</div>
               </div>
               <div className="p-4 bg-black/40 rounded-xl border border-cyan-500/30">
                 <div className="text-sm text-gray-400 mb-1">Active Metrics</div>

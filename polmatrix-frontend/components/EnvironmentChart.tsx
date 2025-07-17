@@ -100,7 +100,7 @@ export default function EnvironmentChart({ data, selectedMetrics, onToggleMetric
 
   // Aggregate data by year to prevent duplicate years on X-axis
   const aggregatedData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    if (!data || !Array.isArray(data) || data.length === 0) return [];
 
     // Group data by year
     const yearGroups = data.reduce((acc: Record<number, { year: number; items: any[]; count: number }>, item: any) => {
