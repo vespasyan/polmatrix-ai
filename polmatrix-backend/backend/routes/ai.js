@@ -9,12 +9,36 @@ const { runSimulation } = require("../services/simulator");
 router.post("/simulate", async (req, res, next) => {
   try {
     console.log("🎯 /simulate endpoint hit with:", req.body);
-    const parsed = parsePolicyQuestion(req.body.text);
+    const { text, selectedMetrics } = req.body;
+    const parsed = parsePolicyQuestion(text);
     console.log("Parsed:", parsed);
+    
+    let metricsToUse = parsed.metrics.map(m => m.metricKey);
+    
+    // If selectedMetrics are provided, use them to filter or enhance the detected metrics
+    if (selectedMetrics) {
+      console.log("📊 Selected metrics provided:", selectedMetrics);
+      
+      // Collect all selected metrics from all domains
+      const allSelectedMetrics = [
+        ...(selectedMetrics.economy || []),
+        ...(selectedMetrics.education || []),
+        ...(selectedMetrics.environment || []),
+        ...(selectedMetrics.health || [])
+      ];
+      
+      if (allSelectedMetrics.length > 0) {
+        // Use selected metrics if provided, but still include parser-detected metrics
+        // This ensures we show relevant charts while respecting user preferences
+        const combinedMetrics = [...new Set([...metricsToUse, ...allSelectedMetrics])];
+        metricsToUse = combinedMetrics;
+        console.log("🔄 Using combined metrics (parsed + selected):", metricsToUse);
+      }
+    }
 
     const result = await runSimulation({
       region: "US",
-      metrics: parsed.metrics.map(m => m.metricKey),
+      metrics: metricsToUse,
       startYear: parsed.time.startYear,
       endYear: parsed.time.endYear,
       levers: parsed.policies,
@@ -153,7 +177,7 @@ Question: "${question}"
 Return exactly this JSON structure:
 {
   "domains": ["economy", "health", "education", "environment"],
-  "primary_domain": "economy",
+  "primary_domain": "economy", 
   "metrics": ["gdp_growth_rate", "unemployment_rate", "inflation_rate"],
   "time_focus": "recent_trends",
   "geographic_scope": "comparative",
@@ -164,7 +188,7 @@ Return exactly this JSON structure:
 
 Available domains and their key metrics:
 - Economy: gdp_growth_rate, unemployment_rate, inflation_rate, trade_balance, investment_rate, gdp_per_capita
-- Health: life_expectancy, maternal_mortality_rate, healthcare_expenditure_per_capita, physician_density, infant_mortality
+- Health: life_expectancy, maternal_mortality_rate, healthcare_expenditure_per_capita, physician_density, infant_mortality_rate
 - Education: literacy_rate, school_enrollment_rate, education_expenditure_per_capita, primary_completion_rate, teacher_student_ratio
 - Environment: co2_emissions, renewable_energy_percentage, forest_area_percentage, air_pollution_index, deforestation_rate
 
@@ -212,7 +236,7 @@ Geographic scope: "single_country", "comparative", "regional", "global"
       console.error("❌ JSON Parse Error:", parseError);
       console.error("❌ Raw response:", analysisText);
       
-      // Fallback analysis
+      // Fallback analysis - use relevant metrics instead of hardcoded ones
       const fallbackAnalysis = {
         domains: ["economy"],
         primary_domain: "economy",

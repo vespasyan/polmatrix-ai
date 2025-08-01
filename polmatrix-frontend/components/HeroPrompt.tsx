@@ -260,15 +260,17 @@ export default function HeroPrompt({ onStartSimulation }: HeroPromptProps) {
     // Clear any warnings and proceed
     setLanguageWarning("");
     console.log("🚀 Starting simulation with prompt:", inputValue);
-    await run(inputValue.trim());
+    await run(inputValue.trim()); // No selected metrics available from HeroPrompt
     onStartSimulation(inputValue.trim());
-  };const handleSampleClick = useCallback(async (promptText: string) => {
+  };
+
+  const handleSampleClick = useCallback(async (promptText: string) => {
     if (loading) return;
     setInputValue(promptText);
     setCharCount(promptText.length);
     setLanguageWarning(""); // Clear any warnings for sample questions
     console.log("🚀 Starting simulation with sample prompt:", promptText);
-    await run(promptText);
+    await run(promptText); // No selected metrics available from HeroPrompt
     onStartSimulation(promptText);
   }, [loading, onStartSimulation, run]);
 

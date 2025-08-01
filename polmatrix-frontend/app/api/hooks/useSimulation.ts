@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { simulatePolicy } from "../../api/ai/simulate";
 
+interface SelectedMetrics {
+  economy: string[];
+  education: string[];
+  environment: string[];
+  health: string[];
+}
+
 export function useSimulation() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  async function run(question: string) {
+  async function run(question: string, selectedMetrics?: SelectedMetrics) {
     setLoading(true);
     try {
-      const simData = await simulatePolicy(question);
+      const simData = await simulatePolicy(question, selectedMetrics);
       console.log("SIMULATOR DATA:", simData);
       setData(simData);
     } catch (e) {

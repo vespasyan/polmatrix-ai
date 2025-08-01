@@ -19,11 +19,24 @@ export const endpoints = {
 }
 
 //Sample Questions...
-export async function fetchSimulationData(prompt: string): Promise<any[]> {
+interface SelectedMetrics {
+  economy: string[];
+  education: string[];
+  environment: string[];
+  health: string[];
+}
+
+export async function fetchSimulationData(prompt: string, selectedMetrics?: SelectedMetrics): Promise<any[]> {
+  const requestBody: any = { text: prompt };
+  
+  if (selectedMetrics) {
+    requestBody.selectedMetrics = selectedMetrics;
+  }
+
   const res = await fetch("/api/ai/simulate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: prompt }),
+    body: JSON.stringify(requestBody),
   });
 
   const json = await res.json();

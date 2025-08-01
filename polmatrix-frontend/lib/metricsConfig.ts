@@ -103,7 +103,7 @@ export const metricCategories = {
   trade: ["Trade Volume", "Intellectual Property", "Technology Trade", "Trade Balance"]
 }
 
-/*
+
 // Default metrics to display for each domain
 export const defaultMetrics = {
   economy: ["gdp_growth", "unemployment_rate", "inflation_rate", "gdp_per_capita"],
@@ -114,13 +114,4 @@ export const defaultMetrics = {
   technology: ["internet_usage", "mobile_subscriptions", "research_expenditure", "innovation_index"],
   trade: ["trade_percentage_of_gdp", "high_tech_exports", "trade_balance_goods", "exports_of_goods_services"]
 }
-  */
-export const defaultMetrics = {
-  economy: ["gdp_growth"],
-  health: ["life_expectancy"],
-  education: ["literacy_rate"],
-  environment: ["co2_emissions"],
-  socialDemographic: ["population_growth", "gini_index", "poverty_rate", "fertility_rate"],
-  technology: ["internet_usage", "mobile_subscriptions", "research_expenditure", "innovation_index"],
-  trade: ["trade_percentage_of_gdp", "high_tech_exports", "trade_balance_goods", "exports_of_goods_services"]
-} 
+  

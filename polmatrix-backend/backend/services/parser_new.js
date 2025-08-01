@@ -206,4 +206,3 @@ function parsePolicyQuestion(text) {
 }
 
 module.exports = { parsePolicyQuestion };
-// backend/services/parser_new.js

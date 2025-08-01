@@ -3,7 +3,7 @@ const { runSimulation } = require("../services/simulator");
 (async () => {
   const result = await runSimulation({
     region: "US",
-    metrics: ["gdp", "education_index", "co2_emissions", "health_index"],
+    metrics: ["gdp_growth_rate", "literacy_rate", "co2_emissions", "life_expectancy"],
     startYear: 2024,
     endYear: 2035,
     levers: [

@@ -103,20 +103,38 @@ export default function EconomyChart({
   const aggregatedData = useMemo(() => {
     if (!data || !Array.isArray(data) || data.length === 0) return [];
 
+    // First check if we have any data in the 2025-2030 range
+    const futureDataExists = data.some((item: any) => item.year >= 2025 && item.year <= 2030);
+    
     // Group data by year
     const yearGroups = data.reduce((acc: Record<number, { year: number; items: any[]; count: number }>, item: any) => {
       const year = item.year;
       if (!year) return acc;
       
-      if (!acc[year]) {
-        acc[year] = {
-          year,
+      // If we have future data (2025-2030), use only that range
+      // Otherwise, transform existing data to 2025-2030 range
+      let targetYear = year;
+      if (futureDataExists) {
+        // Use future data only
+        if (year < 2025 || year > 2030) return acc;
+      } else {
+        // Transform existing data to future range (2020-2024 becomes 2025-2029)
+        if (year >= 2020 && year <= 2024) {
+          targetYear = year + 5; // 2020->2025, 2021->2026, etc.
+        } else if (year < 2020 || year > 2024) {
+          return acc; // Skip data outside 2020-2024 range
+        }
+      }
+      
+      if (!acc[targetYear]) {
+        acc[targetYear] = {
+          year: targetYear,
           items: [],
           count: 0
         };
       }
-      acc[year].items.push(item);
-      acc[year].count++;
+      acc[targetYear].items.push(item);
+      acc[targetYear].count++;
       return acc;
     }, {});
 
@@ -141,19 +159,19 @@ export default function EconomyChart({
   
   // Calculate the maximum year from both data and simulationData to set appropriate chart bounds
   const getMaxYear = useCallback(() => {
-    let maxYear = new Date().getFullYear() + 1; // Default to next year
+    let maxYear = 2030; // Set max year to 2030 for the range 2025-2030
     
-    // Check aggregated data for years
+    // Check aggregated data for years (should now be in 2025-2030 range)
     if (aggregatedData && aggregatedData.length > 0) {
-      const dataYears = aggregatedData.map((item: any) => item.year || 0).filter((year: number) => year > 0);
+      const dataYears = aggregatedData.map((item: any) => item.year || 0).filter((year: number) => year >= 2025 && year <= 2030);
       if (dataYears.length > 0) {
         maxYear = Math.max(maxYear, ...dataYears);
       }
     }
     
-    // Check simulationData for years
+    // Check simulationData for years (within 2025-2030 range)
     if (simulationData && simulationData.length > 0) {
-      const simYears = simulationData.map(item => item.year || 0).filter(year => year > 0);
+      const simYears = simulationData.map(item => item.year || 0).filter(year => year >= 2025 && year <= 2030);
       if (simYears.length > 0) {
         maxYear = Math.max(maxYear, ...simYears);
       }

@@ -227,7 +227,13 @@ export default function DashboardView({ initialPrompt: propInitialPrompt }: Dash
       setSmartInsights(aiInsights);
       
       console.log("📡 Step 4: Fetching simulation data...");
-      const simulationOutput = await fetchSimulationData(question);
+      const selectedMetrics = {
+        economy: economyMetrics,
+        education: educationMetrics,
+        environment: environmentMetrics,
+        health: healthMetrics
+      };
+      const simulationOutput = await fetchSimulationData(question, selectedMetrics);
       setSimulatedData(simulationOutput);
       
       // Set summary for compatibility with existing SimulationResults
