@@ -1,32 +1,201 @@
 
----
-
-## 🧱 New: `sql/schema.sql` (add this file)
-
-```sql
-CREATE TABLE regions (
-  region_id   TEXT PRIMARY KEY,
-  region_name TEXT
-);
-
-CREATE TABLE metrics (
-  metric_code TEXT PRIMARY KEY,
-  domain      TEXT,
-  unit        TEXT,
-  description TEXT
-);
-
-CREATE TABLE facts (
-  region_id   TEXT REFERENCES regions,
-  year        INT,
-  metric_code TEXT REFERENCES metrics,
-  value       NUMERIC,
-  PRIMARY KEY (region_id, year, metric_code)
-);
-CREATE TABLE metadata (
-  region_id   TEXT REFERENCES regions,
-  year        INT,
-  metric_code TEXT REFERENCES metrics,
-  source      TEXT,
-  PRIMARY KEY (region_id, year, metric_code)
-);
+economy
+  —-Comunn(18)
+    —-id
+    —-geography_id
+    —-time_id
+    —-indicator_code
+    —-gdp_growth
+    —-unemployment_rate
+    —-inflation_rate
+    —-trade_balance
+    —-foreign_direct_investment
+    —-gdp_per_capita
+    —-source
+    —-gdp_growth_filter
+    —-unemployment_rate_filter
+    —-inflation_rate_filter
+    —-avarage_gdp_growth
+    —-total_trade_balance
+    —-gdp_growth_rate_percentage
+    —-gdp_per_capita_growth
+  —-Constraints(3)
+    —-economy_geo_time_indicator_unique
+    —-economy_pkey
+    —-fk_geography
+    —-fk_time
+education
+  —-Comunn(21)
+    —-id
+    —-geography_id
+    —-time_id
+    —-indicator_Code
+    —-literacy_rate
+    —-school_enrollment_rate
+    —-education_expenditure
+    —-teacher_student_ratio
+    —-gender_parity_in_education
+    —-source
+    —-literacy_rate_filter
+    —-school_enrollment_rate_filter
+    —-education_expenditure_filter
+    —-average_literacy_rate
+    —-total_education_expenditure
+    —-teacher_student_ratio_metric
+    —-enrollment_primary
+    —-enrollment_secondary
+    —-enrollment_tertiary
+    —-government_expenditure_pct_gdp
+    —-primary_completion_rate
+  —-Constraints(3)
+    —-education_geo_time_indicator_unique
+    —-education_pkey
+    —-fk_geography
+    —-fk_time
+environment
+  —-Comunn(21)
+    —-id
+    —-geography_id
+    —-time_id
+    —-indicator_code
+    —-co2_emissions
+    —-renewable_energy_usage
+    —-deforestation_rate
+    —-energy_use
+    —-water_usage
+    —-source
+    —-co2_emissions_filter
+    —-renewable_energy_usage_filter
+    —-energy_use_filter
+    —-total_co2_emissions
+    —-renewable_energy_percentage
+    —-average_deforestation_rate
+    —-pm25
+    —-forest_area_pct
+    —-energy_use_kg_oil_pc
+    —-electric_power_kwh_pc
+    —-freshwater_withdrawal_pct
+  —-Constraints(8)
+    —-environment_geo_time_indicator_unique
+    —-environment_pkey
+    —-fk_geography
+    —-fk_time
+geography
+  —-Comunn(4)
+    —-geography_id
+    —-country_name
+    —-country_code
+    —-region
+  —-Constraints(2)
+    —-geography_country_code_key
+    —-geography_pkey
+health
+  —-Comunn(21)
+    —-id
+    —-geography_id
+    —-time_id
+    —-indicator_code
+    —-life_expectancy
+    —-maternal_mortality
+    —-healthcare_expenditure
+    —-infant_mortality
+    —-disease_burden
+    —-source
+    —-life_expectancy_filter
+    —-maternal_mortality_filter
+    —-healthcare_expenditure_filter
+    —-average_life_expectancy
+    —-total_healthcare_expenditure
+    —-infant_mortality_rate
+    —-under5_mortality_per_1k
+    —-maternal_mortality_ratio
+    —-physicians_per_1k
+    —-hospital_beds_per_10k
+    —-suicide_rate_per_100k
+  —-Constraints(3)
+    —-health_geo_time_indicator_unique
+    —-fk_geography
+    —-fk_time
+    —-health_pkey
+indicator
+  —-Comunn(5)
+    —-indicator_code
+    —-indicator_name
+    —-description
+    —-source
+    —-unit
+  —-Constraints(1)
+    —-indicator_pkey
+social_demographic
+  —-Comunn(6)
+    —-id
+    —-geography_id
+    —-time_id
+    —-indicator_code
+    —-population_total
+    —-population_growth
+    —-fertility_rate
+    —-age_dependency_ratio
+    —-gini_index
+    —-poverty_rate
+    —-homicide_rate
+    —-child_labor
+    —-stunting_rate
+    —-immunization_dpt
+    —-source
+  —-Constraints(3)
+    —-fk_geography
+    —-fk_time
+    —-social_demographic_pkey
+source
+  —-Comunn(5)
+    —-source_id
+    —-source_name
+    —-source_description
+    —-source_url
+    —-source_type
+  —-Constraints(1)
+    —-source_pkey
+technology_innovation
+  —-Comunn(12)
+    —-id
+    —-geography_id
+    —-time_id
+    —-indicator_code
+    —-internet_usage
+    —-mobile_subscriptions
+    —-scientific_articles
+    —-patent_applications
+    —-research_expenditure
+    —-broadband_subscriptions
+    —-innovation_index
+    —-source
+  —-Constraints(3)
+    —-fk_geography
+    —-fk_time
+    —-technology_innovation_pkey
+time
+  —-Comunn(3)
+    —-time_id
+    —-year
+    —-quarter
+  —-Constraints(2)
+    —-time_pkey
+    —-time_quarter_check
+trade
+  —-Comunn(11)
+    —-id
+    —-geography_id
+    —-time_id
+    —-indicator_code
+    —-trade_percentage_of_gdp
+    —-ip_payments
+    —-high_tech_exports
+    —-trade_balance_goods
+    —-trade_balance_services
+    —-exports_of_goods_services
+    —-source
+  —-Constraints(3)
+    —-fk_geography
+    —-fk_time
+    —-trade_pkey
